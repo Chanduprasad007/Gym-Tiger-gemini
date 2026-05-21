@@ -10,6 +10,7 @@
         "displayName": { "type": "string", "description": "User's public name" },
         "streak": { "type": "integer", "description": "Current workout consecutive day streak" },
         "totalWorkouts": { "type": "integer", "description": "Total workouts logged" },
+        "lastCompletedDate": { "type": "string", "description": "Last completed training session timestamp" },
         "updatedAt": { "type": "string", "format": "date-time", "description": "Last updated timestamp" }
       },
       "required": ["userId", "email", "streak", "totalWorkouts", "updatedAt"]
