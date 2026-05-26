@@ -1,11 +1,18 @@
 const WORKOUTX_API_KEY = "wx_2f5e7d97345de8a1af152ca4bc65f17f969d18997ef865004f66cf18";
 const BASE_URL = "https://workoutxapp.com/api/v1";
 
+export interface Alternate {
+  name: string;
+  target: string;
+  instructions: string[];
+}
+
 export interface ExerciseExtraInfo {
   gifUrl: string;
   alternateName: string;
   alternateInstructions: string[];
   alternateTarget: string;
+  alternatives: Alternate[]; // Array of exactly 3 alternative exercises
   googleSearchUrl: string;
 }
 
@@ -287,6 +294,488 @@ export const CURATED_EXTRAS: Record<
   }
 };
 
+export const ADDITIONAL_ALTERNATIVES: Record<string, { name: string; target: string; instructions: string[] }[]> = {
+  "lats-pulldowns": [
+    {
+      name: "Single-Arm Cable Knee-Slight Row",
+      target: "Outer Lat Sweeps & Serratus",
+      instructions: [
+        "Kneel sideways next to a cable pulley raised to chest height.",
+        "Grasp handle, rotate your torso, and row down and back towards your low ribs.",
+        "Squeeze the outer sweep, fully extending forward to feel the deep stretch."
+      ]
+    },
+    {
+      name: "Chest-Supported Lat DB Row",
+      target: "Rhomboids & Mid-Back Thickness",
+      instructions: [
+        "Lie chest-down on a bench set to 30 degrees, holding weights below.",
+        "Row dumbbells upward towards your hips, retracting shoulder blades.",
+        "Squeeze outer-mid back muscles before under-control extension down."
+      ]
+    }
+  ],
+  "pullups-weighted": [
+    {
+      name: "Primal Bodyweight Inverted Rows",
+      target: "Upper Back Restoration & Grips",
+      instructions: [
+        "Hang beneath a bar set to chest height with legs straight on the floor.",
+        "Pull your chest to the bar under strict postural alignment.",
+        "Decompress slowly to arm extension, maintaining a hollow core."
+      ]
+    },
+    {
+      name: "Assisted Pullup Machine",
+      target: "Lats & Shoulder Posture Alignment",
+      instructions: [
+        "Select assistant weight, place knees securely on the pad.",
+        "Grasp outer handles wide, pull body vertically keeping shoulders down.",
+        "Control descent to prevent joint shearing at bottom range."
+      ]
+    }
+  ],
+  "lateral-raises": [
+    {
+      name: "Incline Bench Dumbbell Lateral Raise",
+      target: "Side Deltoids (Upper Peak)",
+      instructions: [
+        "Lie chest-down on an incline bench at 45 degrees holding dumbbells.",
+        "Raise weights outward sideways to shoulder level in a strong arc.",
+        "Slowly lower dumbbells, keeping tension strictly on side caps."
+      ]
+    },
+    {
+      name: "Primal Kettlebell Halos",
+      target: "Shoulder Girdle Rotator Decompression",
+      instructions: [
+        "Stand tall, cradling a light kettlebell upside down in front of your chin.",
+        "Orbit the kettlebell horizontally around your head under strict core brace.",
+        "Alternate directions smoothly to lubricate glenohumeral joints."
+      ]
+    }
+  ],
+  "face-pulls": [
+    {
+      name: "Bent-Over Dumbbell Rear Delt Raises",
+      target: "Rear Deltoid Posterior Caps",
+      instructions: [
+        "Hinge hips back forty-five degrees, keeping flat spine.",
+        "Raise dumbbells out to your sides, driving with the back of elbows.",
+        "Feel the rear shoulders work, descending back down without swing."
+      ]
+    },
+    {
+      name: "Mobility Band Pull-Aparts",
+      target: "Scapular Retractors & Rhomboids",
+      instructions: [
+        "Stand tall holding a resistance band straight in front with hands wide.",
+        "Pull your hands apart across your chest, squeezing shoulder blades tightly.",
+        "Control back to center, preserving perfect vertical head posture."
+      ]
+    }
+  ],
+  "core-plank-bracing": [
+    {
+      name: "Side Plank with Hip Dips",
+      target: "Oblique Core Bracing & Anchoring",
+      instructions: [
+        "Prop up on one elbow in a linear side plank posture.",
+        "Dip hips slowly to touch the floor, then drive them high back up.",
+        "Activate internal obliques, keeping head aligned over spine."
+      ]
+    },
+    {
+      name: "Ab Wheel Core Rollouts",
+      target: "Eccentric Core & Rectus Tension",
+      instructions: [
+        "Kneel on a soft pad, grasping your ab wheel handles.",
+        "Roll forward, keeping back arched in a hollow body brace.",
+        "Pull yourself back using your abdominal wall with pristine control."
+      ]
+    }
+  ],
+  "chest-incline-press": [
+    {
+      name: "Reverse Grip Flat Bench Press",
+      target: "Clavicular Upper Pec Fiber Activation",
+      instructions: [
+        "Lie flat on the bench, grasping the barbell with an underhand grip.",
+        "Unrack and lower with flare control to touch upper chest collar area.",
+        "Drive vertically, maintaining active chest engagement and locked upper back."
+      ]
+    },
+    {
+      name: "Seated Incline Chest Press Machine",
+      target: "Clavicular Pec Isolation & Push",
+      instructions: [
+        "Align seat height so handles sit close to upper chest.",
+        "Press outward powerfully, avoiding shoulder takeover at end range.",
+        "Return under active horizontal tension to dynamic stretch."
+      ]
+    }
+  ],
+  "rear-delt-flyes": [
+    {
+      name: "Seated Cable Rear Delt Flyes",
+      target: "Rear Delts (Continuous Cable Squeeze)",
+      instructions: [
+        "Stand centering two pulleys. Grab left cable with right hand, right with left.",
+        "Retract rear shoulders outward wide parallel to floor.",
+        "Control hands back to start under complete cable tension."
+      ]
+    },
+    {
+      name: "Chest-Supported Dumbbell Y-Lifts",
+      target: "Lower Trapezius & Postural Support",
+      instructions: [
+        "Lie face down on a 30-degree incline holding light weights.",
+        "Raise arms up and out in a wide 'Y' shape, thumbs facing high.",
+        "Squeeze the mid-outer back, avoiding neck shrug."
+      ]
+    }
+  ],
+  "chest-dips": [
+    {
+      name: "Dumbbell Floor Press",
+      target: "Inner Pectoralis & Triceps Lockout",
+      instructions: [
+        "Lie flat on your back on the floor, holding dumbbells above.",
+        "Descend dumbbells until upper arms touch floor flats gently.",
+        "Press upward of chest squeeze, saving shoulders from excessive deep range."
+      ]
+    },
+    {
+      name: "Weighted Pushups (Plate On Upper Back)",
+      target: "Pectoralis Major & Scapular Push",
+      instructions: [
+        "Place weight plate on your upper pack, standard pushup posture.",
+        "Lower chest to touch floor, maintaining strict trunk alignment.",
+        "Press up forcefully, protracting scapula at peak squeeze."
+      ]
+    }
+  ],
+  "dumbbell-pullover": [
+    {
+      name: "Elite Decline Dumbbell Pullover",
+      target: "Serratus & Expanded Thoracic Cage",
+      instructions: [
+        "Utilize a decline bench, anchoring feet fully.",
+        "Lower dumbbells behind head in wide arc, keeping hips down.",
+        "Squeeze serratus to raise dumbbells back to eye level."
+      ]
+    },
+    {
+      name: "Straight-Arm Lat Cable Pushdowns",
+      target: "Outer Lats & Armpit Isolation",
+      instructions: [
+        "Stand facing high cable, gripping bar shoulder wide.",
+        "Hinge slightly, pulling bar down to thighs with straight arms.",
+        "Contract outer lats, stretching back up controlled."
+      ]
+    }
+  ],
+  "core-hanging-raises": [
+    {
+      name: "Lying Leg Lifts with Posterior Butt Lift",
+      target: "Shorter Range Lower Ab Bracing",
+      instructions: [
+        "Lie face up on floor, hands flat next to hips.",
+        "Raise legs vertical, then push heels straight up lifting pelvis.",
+        "Lower slowly back to floor, preventing low back arching."
+      ]
+    },
+    {
+      name: "Primal Advanced Dragon Flag Negatives",
+      target: "Elite Full-Body Core Tenacity",
+      instructions: [
+        "Lie on bench, grasping edges behind head closely.",
+        "Kick legs/pelvis vertical, raising entire trunk off pad.",
+        "Lower body down in a rigid linear plank slowly as possible."
+      ]
+    }
+  ],
+  "farmer-carries": [
+    {
+      name: "Kettlebell Front Rack Walks",
+      target: "Anterior Core Deep Alignment",
+      instructions: [
+        "Clean two kettlebells into a tight front-rack posture.",
+        "Brace core, keep chest standing high, and walk slowly.",
+        "Do not slouch forward holding the anterior load."
+      ]
+    },
+    {
+      name: "Heavy Sandbag Chest Carries",
+      target: "Spine Erectors & Upper Back Bracing",
+      instructions: [
+        "Hug a heavy sandbag tight into chest, shoulders packed.",
+        "Maintain upright postural carriage while walking with short, fast strides.",
+        "Teaches extreme torso structural rigidity under load."
+      ]
+    }
+  ],
+  "core-paloff": [
+    {
+      name: "Cable Core Woodchoppers",
+      target: "Obliques & Dynamic Rotational Drive",
+      instructions: [
+        "Stand shoulder wide, holding handle on high cable sideways.",
+        "Rotate hips and pull cable diagonally down across your body.",
+        "Pivot trailing foot, returning under solid torso control."
+      ]
+    },
+    {
+      name: "Rotational Russian Twists (Dumbbell/Kettlebell)",
+      target: "Obliques & Active Twist Bracing",
+      instructions: [
+        "Sit on floor, knees bent, leaning torso back 45 degrees.",
+        "Hold weight close, twist torso side to side matching head track.",
+        "Engage core, keeping spine linear without slumping back."
+      ]
+    }
+  ],
+  "bird-dogs": [
+    {
+      name: "Glute Bridges with Alternate Extension",
+      target: "Hamstrings, Glutes & Pelvic Reset",
+      instructions: [
+        "Lie face up, knees bent. Lift hips high to bridge.",
+        "Slowly extend one knee straight, maintaining level hips.",
+        "Squeeze glutes, return foot, and swap sides."
+      ]
+    },
+    {
+      name: "Postural Prone Cobra Holds (Thoracic)",
+      target: "Thoracic Extension & Upper Back Health",
+      instructions: [
+        "Lie face down on floor, chest and chin resting neutral.",
+        "Lift upper chest off ground, peeling hands, squeezing thumbs up.",
+        "Hold peak extension for five seconds, looking down."
+      ]
+    }
+  ],
+  "posterior-rdl": [
+    {
+      name: "Good Mornings with Light Kettlebell",
+      target: "Hinge Pattern Hamstring Stretch",
+      instructions: [
+        "Stand tall, hugging light kettlebell tightly into upper chest.",
+        "Push hips backward bowing forward with flat spine.",
+        "Rise to start, squeezing glutes hard at peak alignment."
+      ]
+    },
+    {
+      name: "Single-Leg Dumbbell RDL",
+      target: "Unilateral Hamstrings & Hip Knee Stabilizers",
+      instructions: [
+        "Stand on one foot holding dumbbells. Keep back straight.",
+        "Hinge hips, lifting non-standing leg straight back.",
+        "Descend weights close to leg, then drive standing foot to rise."
+      ]
+    }
+  ],
+  "back-extensions": [
+    {
+      name: "Reverse Hyperextensions on Flat Bench",
+      target: "Lumbo-Pelvic Decompression & Glutes",
+      instructions: [
+        "Lie chest-down on flat bench, hips resting off edge, grabbing pad.",
+        "Keep legs straight and raise them to horizontal using glutes.",
+        "Lower slowly below bench line to stretch lower back safely."
+      ]
+    },
+    {
+      name: "Dynamic Kettlebell Swings (Hip Hinge)",
+      target: "Posterior Chain Kinetic Power & Back Strength",
+      instructions: [
+        "Hinge at hips, pulling kettlebell between legs.",
+        "Drive hips forward explosively, swinging kettlebell to chest line.",
+        "Maintain upright posture at peak lockout, avoiding lean-back."
+      ]
+    }
+  ],
+  "good-mornings": [
+    {
+      name: "Cable Postural Pull-Throughs",
+      target: "Glute Hinge & Lower Back Decompression",
+      instructions: [
+        "Stand facing away from low cable, rope pulled between legs.",
+        "Hinge forward pushing hips back, allowing cable to pull hands under.",
+        "Drive hips forward, standing tall with complete posterior glute squeeze."
+      ]
+    },
+    {
+      name: "Chest-Supported Dumbbell Rows (Incline Bench Hinge)",
+      target: "Postural Mid-Back Align & Rhomboids",
+      instructions: [
+        "Sit chest Supported on 30 degree incline bench holding dumbbells.",
+        "Row dumbbells strictly upwards keeping chest wide, retracting blades.",
+        "Control down smoothly to decompress mid-back tension."
+      ]
+    }
+  ],
+  "kettlebell-carries": [
+    {
+      name: "Zercher Load Walks (Barbell in Elbows)",
+      target: "Anterior Rib Protection & Posture Power",
+      instructions: [
+        "Cradle barbell tightly in crooks of your elbows, chest held high.",
+        "Walk with solid, tight steps, bracing pelvis and upper core.",
+        "Do not allow upper shoulders to slouch forward under barbell."
+      ]
+    },
+    {
+      name: "Standard Heavy Dumbbell Walks",
+      target: "Traps & Absolute Grip Symmetric Health",
+      instructions: [
+        "Stand holding two robust dumbbells at sides.",
+        "Squeeze handles, pack shoulders, and walk with tall, deliberate stride."
+      ]
+    }
+  ],
+  "shoulder-db-press": [
+    {
+      name: "Overhead Barbell Military Press",
+      target: "Anterior Delts & Absolute Push Power",
+      instructions: [
+        "Setup barbell on upper rack. Unrack resting on collarbone line.",
+        "Core braced, press bar vertically close to face.",
+        "Lockout overhead, pushing head slightly forward at top of range."
+      ]
+    },
+    {
+      name: "Landmine Single-Arm Diagonal Press",
+      target: "Unilateral Anterior Delts & Rotator Cuff",
+      instructions: [
+        "Stand close to landmine sleeve, holding bar end in right palm.",
+        "Press bar up-and-forward diagonally under controlled stance.",
+        "Avoid twisting lower back; push directly from shoulders."
+      ]
+    }
+  ],
+  "dumbbell-bicep-curls": [
+    {
+      name: "Preacher Bench Dumbbell Curls",
+      target: "Bicep Peak Short Head Isolator",
+      instructions: [
+        "Sit on preacher bench resting upper arms flat on pad.",
+        "Curl dumbbell upward to chin, squeeze forearm flexors.",
+        "Extend arms fully back down under strict slow control."
+      ]
+    },
+    {
+      name: "Cable Bicep Flex Curls (High Pulley Dual)",
+      target: "Symmetric Bicep Peak Peak Tension",
+      instructions: [
+        "Center between high cables holding both D-handles.",
+        "Curl hands towards ears, keeping upper arms parallel to floor.",
+        "Deeply contract bicep peak, returning slowly."
+      ]
+    }
+  ],
+  "tricep-pushdown": [
+    {
+      name: "EZ Bar Close Grip Push Press",
+      target: "Triceps Core Power Block & Inner Chest",
+      instructions: [
+        "Lie on bench, grip EZ bar inside shoulder width.",
+        "Lower bar to mid chest keeping elbows tucked tight to ribs.",
+        "Press up explosively, squeezing triceps at peak lockout."
+      ]
+    },
+    {
+      name: "Bodyweight Parallel Bench Dips",
+      target: "Triceps Lateral Squeeze & Lower Chest",
+      instructions: [
+        "Sit on bench flat, hands next to hips. Reach legs straight in front.",
+        "Slide hips forward off bench, dip down bending elbows ninety degrees.",
+        "Press straight back up using triceps power."
+      ]
+    }
+  ],
+  "arms-hammer-curls": [
+    {
+      name: "Cross-Body Cable Cable Hammer Curls",
+      target: "Brachialis Outer Arm Thickness",
+      instructions: [
+        "Grab low cable handle using neutral thumb-up grip.",
+        "Curl across torso towards opposite clavicle, squeezing outer arm.",
+        "Release down slowly to experience clean cable tension."
+      ]
+    },
+    {
+      name: "Reverse Grip Barbell Extensor Curls",
+      target: "Forearm Muscle Extensor System",
+      instructions: [
+        "Rest forearms on flat bench, hands hanging off edge pronated.",
+        "Curl wrists upwards, raising the barbell using forearms.",
+        "Decompress smoothly to full extension."
+      ]
+    }
+  ],
+  "rotational-turkish-getup": [
+    {
+      name: "Primal Dumbbell Static Overhead Hold",
+      target: "Thoracic Rib Cage Alignment & Cuff",
+      instructions: [
+        "Clean and press heavy dumbbell overhead, arm locked straight.",
+        "Engage core, keep eyes straight forward, and hold for 30s.",
+        "Provides excellent shoulder active stability reset."
+      ]
+    },
+    {
+      name: "Prone Kneeling T-Spine Opener Stretch",
+      target: "T-Spine Mobility & Active Recovery",
+      instructions: [
+        "Get onto hands and knees. Place left hand behind head.",
+        "Rotate elbow down to touch right forearm, then twist high to ceiling.",
+        "Open thoracic spine thoroughly, returning controlled."
+      ]
+    }
+  ],
+  "recovery-dead-hangs": [
+    {
+      name: "Prone Active Child's Pose Lat Reach",
+      target: "Thoracic Lat & Rib Cage Unwinding",
+      instructions: [
+        "Kneel on floor, sink hips back to heels stretching arms forward.",
+        "Walk both hands slowly to left side, breathing into right lower ribcage.",
+        "Repeat on opposite side to decompress lat attachments."
+      ]
+    },
+    {
+      name: "Doorway Postural Pec & Thoracic Opener",
+      target: "Front Collarbone Decompression & Posture",
+      instructions: [
+        "Place forearms on door frame, elbows at ninety degrees.",
+        "Step body forward gently, breathing into deep front pec stretch.",
+        "Restores chest opening after heavy press sessions."
+      ]
+    }
+  ],
+  "recovery-bird-dogs": [
+    {
+      name: "Kneeling Quadruped Outer Hip Circles",
+      target: "Pelvic Deep Reset & Glute Mobility",
+      instructions: [
+        "Keep hands and knees flat. Raise right knee sideways (fire hydrant).",
+        "Draw five large circles slowly in the air using your knee.",
+        "Reconditions hip socket tracking safely."
+      ]
+    },
+    {
+      name: "Thread the Needle Shoulder & Thoracic Sweep",
+      target: "Scapular Restoration & Upper Back Decompression",
+      instructions: [
+        "Kneel on arms and knees. Reach right hand vertically to ceiling.",
+        "Sweep it down and through beneath left armpit, resting shoulder on floor.",
+        "Hold for deep breath into back scapula, restoring thoracic space."
+      ]
+    }
+  ]
+};
+
 /**
  * Fetch exercise details from WorkoutX with local fallback if the API is rate-limited,
  * offline, gets CORS blocks, or does not match.
@@ -301,6 +790,26 @@ export async function getExerciseDetails(exerciseId: string, exerciseName: strin
     "Perform the alternative version with slow tempo.",
     "Maintain perfect posture and strong muscular connection."
   ];
+
+  // Compile 3 alternatives in order
+  const alt1 = {
+    name: alternateName,
+    target: alternateTarget,
+    instructions: alternateInstructions
+  };
+  const extraAlts = ADDITIONAL_ALTERNATIVES[exerciseId] || [
+    {
+      name: `${exerciseName} Alternative 2`,
+      target: alternateTarget,
+      instructions: ["Perform with steady control.", "Focus on target muscle fatigue."]
+    },
+    {
+      name: `${exerciseName} Alternative 3`,
+      target: alternateTarget,
+      instructions: ["Execute using controlled negative.", "Maintain straight posture and solid alignment."]
+    }
+  ];
+  const alternatives = [alt1, ...extraAlts]; // Array of exactly 3 alternatives
 
   const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent("how to do " + exerciseName + " exercise form video search help")}`;
 
@@ -322,6 +831,7 @@ export async function getExerciseDetails(exerciseId: string, exerciseName: strin
             alternateName,
             alternateTarget,
             alternateInstructions,
+            alternatives,
             googleSearchUrl
           };
         }
@@ -338,6 +848,7 @@ export async function getExerciseDetails(exerciseId: string, exerciseName: strin
     alternateName,
     alternateTarget,
     alternateInstructions,
+    alternatives,
     googleSearchUrl
   };
 }

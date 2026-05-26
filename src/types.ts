@@ -6,7 +6,7 @@ export interface UserStats {
   displayName: string;
   streak: number;
   totalWorkouts: number;
-  lastCompletedDate?: string;
+  lastCompletedDate?: string | null;
 }
 
 export interface LoggedSet {

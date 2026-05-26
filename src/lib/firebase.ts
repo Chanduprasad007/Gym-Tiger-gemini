@@ -1,5 +1,5 @@
 import { initializeApp, getApp, getApps } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs, query, orderBy, deleteDoc, getDocFromServer } from "firebase/firestore";
 import firebaseConfig from "../../firebase-applet-config.json";
 
@@ -33,7 +33,14 @@ try {
   console.log("Firebase config not available yet. Operating in Local/Guest Mode.");
 }
 
-export { firestoreDb as db, firebaseAuth as auth, googleProvider as provider, isFirebaseAvailable };
+export { 
+  firestoreDb as db, 
+  firebaseAuth as auth, 
+  googleProvider as provider, 
+  isFirebaseAvailable,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword
+};
 
 // Firestore Operation Types
 export enum OperationType {

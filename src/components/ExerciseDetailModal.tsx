@@ -12,6 +12,8 @@ interface ExerciseDetailModalProps {
 export default function ExerciseDetailModal({ exercise, onClose }: ExerciseDetailModalProps) {
   const [extra, setExtra] = useState<ExerciseExtraInfo | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeAltIdx, setActiveAltIdx] = useState(0);
+  const [mediaErr, setMediaErr] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -74,7 +76,7 @@ export default function ExerciseDetailModal({ exercise, onClose }: ExerciseDetai
                 <div className="w-7 h-7 rounded-full border-2 border-orange-550 border-t-transparent animate-spin" />
                 <p className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">Acquiring WorkoutX stream...</p>
               </div>
-            ) : extra?.gifUrl ? (
+            ) : extra?.gifUrl && !mediaErr ? (
               <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-neutral-950 border border-neutral-850 flex items-center justify-center p-2 group shadow-inner">
                 <img
                   src={extra.gifUrl}
@@ -82,15 +84,21 @@ export default function ExerciseDetailModal({ exercise, onClose }: ExerciseDetai
                   className="h-full max-h-[220px] object-contain mx-auto mix-blend-lighten pointer-events-none rounded-lg"
                   referrerPolicy="no-referrer"
                   loading="lazy"
+                  onError={() => setMediaErr(true)}
                 />
-                <span className="absolute bottom-2.5 right-2.5 text-[8px] font-mono font-medium text-emerald-400 bg-emerald-950/80 border border-emerald-500/20 px-2 py-0.5 rounded uppercase tracking-wider">
+                <span className="absolute bottom-2.5 right-2.5 text-[8px] font-mono font-medium text-emerald-400 bg-emerald-950/80 border border-emerald-500/20 px-2 py-0.5 rounded uppercase tracking-wider animate-pulse">
                   STREAM LIVE OK
                 </span>
               </div>
             ) : (
-              <div className="aspect-video w-full rounded-xl bg-neutral-950 border border-neutral-850 flex flex-col items-center justify-center gap-2 p-4 text-center">
-                <span className="text-xs text-neutral-400 font-medium">GIF demonstration offline</span>
-                <p className="text-[10px] text-neutral-500">Service is currently loading local fallback images.</p>
+              <div className="aspect-video w-full rounded-xl bg-neutral-950 border border-neutral-850 flex flex-col items-center justify-center gap-2 p-5 text-center">
+                <div className="w-11 h-11 rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 mb-1 animate-pulse">
+                  <Target className="w-5 h-5" />
+                </div>
+                <span className="text-xs text-neutral-200 font-extrabold uppercase tracking-tight">Active Target: {exercise.target}</span>
+                <p className="text-[10.5px] text-neutral-400 max-w-sm leading-relaxed">
+                  The animated stream is currently offline. Refer to the <span className="text-white font-bold leading-none">Execution Protocol</span> below and tap the Google Search link for instant form guides.
+                </p>
               </div>
             )}
           </div>
@@ -136,30 +144,58 @@ export default function ExerciseDetailModal({ exercise, onClose }: ExerciseDetai
           </div>
 
           {/* ALTERNATIVE EXERCISE SECTION */}
-          {extra && (
+          {extra && extra.alternatives && (
             <div className="border border-neutral-800/80 bg-neutral-950/60 p-4 rounded-xl flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[9px] font-mono text-orange-400 uppercase tracking-widest font-extrabold">ALTERNATIVE DRILL</span>
-                  <h5 className="text-sm font-bold text-white uppercase tracking-tight mt-0.5">{extra.alternateName}</h5>
+                  <span className="text-[9px] font-mono text-orange-400 uppercase tracking-widest font-extrabold block">ALTERNATIVE DRILLS</span>
+                  <span className="text-[10px] text-neutral-400 font-mono mt-0.5">3 Drills Added</span>
                 </div>
-                <span className="text-[9px] font-mono font-semibold bg-orange-500/10 text-orange-400 border border-orange-500/20 px-2 py-0.5 rounded-md">
-                  {extra.alternateTarget}
-                </span>
+                
+                {/* 3 buttons to check them! */}
+                <div className="flex gap-1 bg-neutral-900 p-1 rounded-lg border border-neutral-800" id="alt-tabs-selector">
+                  {[0, 1, 2].map((idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveAltIdx(idx)}
+                      className={`text-[10.5px] font-mono font-bold px-2.5 py-1 rounded-md transition-all select-none cursor-pointer ${
+                        activeAltIdx === idx
+                          ? "bg-orange-550 text-white shadow-sm"
+                          : "text-neutral-400 hover:text-white"
+                      }`}
+                    >
+                      Alt {idx + 1}
+                    </button>
+                  ))}
+                </div>
               </div>
-              
-              <p className="text-xs text-neutral-400 leading-relaxed italic">
-                If the machine is busy or joints feel stiff, substitute with this alternative drill using identical motor patterns:
-              </p>
 
-              <ul className="flex flex-col gap-1.5 pl-1">
-                {extra.alternateInstructions.map((altStep, altIdx) => (
-                  <li key={altIdx} className="text-xs text-neutral-300 flex items-start gap-2">
-                    <span className="text-orange-500 text-xs font-extrabold select-none">•</span>
-                    <span className="leading-relaxed">{altStep}</span>
-                  </li>
-                ))}
-              </ul>
+              {/* Display currently selected alternative drill */}
+              {extra.alternatives[activeAltIdx] && (
+                <div className="flex flex-col gap-2.5 pt-2 border-t border-neutral-800/50" key={activeAltIdx}>
+                  <div className="flex items-center justify-between">
+                    <h5 className="text-xs font-bold text-white uppercase tracking-tight">
+                      {extra.alternatives[activeAltIdx].name}
+                    </h5>
+                    <span className="text-[9px] font-mono font-semibold bg-orange-500/10 text-orange-400 border border-orange-500/20 px-2 py-0.5 rounded-md">
+                      {extra.alternatives[activeAltIdx].target}
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-neutral-400 leading-relaxed italic">
+                    If the primary setup is busy or joints feel stiff, swap to this alternative drill with identical motor routing:
+                  </p>
+
+                  <ul className="flex flex-col gap-1.5 pl-1">
+                    {extra.alternatives[activeAltIdx].instructions.map((altStep, altIdx) => (
+                      <li key={altIdx} className="text-xs text-neutral-300 flex items-start gap-2">
+                        <span className="text-orange-500 text-xs font-extrabold select-none">•</span>
+                        <span className="leading-relaxed">{altStep}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
 

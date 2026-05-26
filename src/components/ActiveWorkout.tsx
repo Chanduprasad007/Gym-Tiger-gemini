@@ -257,6 +257,8 @@ function ActiveExerciseCard({
   const [showGizmo, setShowGizmo] = useState(false);
   const [extra, setExtra] = useState<ExerciseExtraInfo | null>(null);
   const [fetching, setFetching] = useState(false);
+  const [activeAltIdx, setActiveAltIdx] = useState(0);
+  const [mediaErr, setMediaErr] = useState(false);
 
   useEffect(() => {
     if (showGizmo && !extra) {
@@ -342,45 +344,68 @@ function ActiveExerciseCard({
                     <div className="w-5 h-5 rounded-full border-2 border-orange-550 border-t-transparent animate-spin" />
                     <span className="text-[9px] font-mono text-neutral-500 uppercase">LOAD STREAM...</span>
                   </div>
-                ) : extra?.gifUrl ? (
+                ) : extra?.gifUrl && !mediaErr ? (
                   <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-neutral-950 border border-neutral-800/60 flex items-center justify-center p-1.5">
                     <img
                       src={extra.gifUrl}
                       alt={ex.name}
                       className="h-full max-h-[140px] object-contain mx-auto mix-blend-lighten pointer-events-none rounded"
                       referrerPolicy="no-referrer"
+                      onError={() => setMediaErr(true)}
                     />
                   </div>
                 ) : (
-                  <div className="aspect-video w-full rounded-xl bg-neutral-950 border border-neutral-800 flex items-center justify-center">
-                    <span className="text-[10px] text-neutral-500 font-mono">Stream Offline</span>
+                  <div className="aspect-video w-full rounded-xl bg-neutral-950 border border-neutral-850 flex flex-col items-center justify-center p-2 text-center">
+                    <span className="text-[10px] text-orange-400 font-bold uppercase tracking-wide">STREAM OFFLINE</span>
+                    <span className="text-[9px] text-neutral-500 mt-0.5">Use Alternative Drills</span>
                   </div>
                 )}
-              </div>
-
-              {/* Alternate Exercise Card */}
+              </div>              {/* Alternate Exercise Card */}
               <div className="flex-1 flex flex-col gap-1.5">
-                <span className="text-[9px] font-mono text-neutral-500 uppercase tracking-wider block font-bold">
-                  Alternative Drill
-                </span>
-                
-                {extra ? (
-                  <div className="bg-neutral-900/60 border border-neutral-800 p-3 rounded-xl flex-1 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between gap-2">
-                        <h4 className="text-xs font-bold text-white uppercase tracking-tight">{extra.alternateName}</h4>
-                        <span className="text-[8px] font-mono font-semibold text-orange-400 bg-orange-500/10 border border-orange-500/20 px-1.5 py-0.5 rounded uppercase">
-                          {extra.alternateTarget}
-                        </span>
-                      </div>
-                      <p className="text-[10px] text-neutral-400 leading-relaxed mt-1">
-                        Alternate style if training gear is occupied:
-                      </p>
-                      <p className="text-[11px] text-neutral-300 leading-snug font-sans mt-1.5">
-                        {extra.alternateInstructions[0] || "Execute with absolute posture control."}
-                      </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] font-mono text-neutral-500 uppercase tracking-wider block font-bold">
+                    Alternative Drills (3 available)
+                  </span>
+                  {/* Small tabs for checking alternatives */}
+                  {extra && extra.alternatives && (
+                    <div className="flex gap-0.5 bg-neutral-950 p-0.5 rounded border border-neutral-850">
+                      {[0, 1, 2].map((idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setActiveAltIdx(idx)}
+                          className={`text-[9.5px] font-mono font-extrabold px-1.5 py-0.5 rounded transition-all select-none cursor-pointer ${
+                            activeAltIdx === idx
+                              ? "bg-orange-550 text-white"
+                              : "text-neutral-500 hover:text-white"
+                          }`}
+                        >
+                          Alt {idx + 1}
+                        </button>
+                      ))}
                     </div>
-
+                  )}
+                </div>
+                
+                {extra && extra.alternatives ? (
+                  <div className="bg-neutral-900/60 border border-neutral-800 p-3 rounded-xl flex-1 flex flex-col justify-between" key={activeAltIdx}>
+                    <div>
+                      {extra.alternatives[activeAltIdx] && (
+                        <>
+                          <div className="flex items-center justify-between gap-2 border-b border-neutral-850 pb-1.5">
+                            <h4 className="text-[11px] font-bold text-white uppercase tracking-tight truncate max-w-[130px]" title={extra.alternatives[activeAltIdx].name}>
+                              {extra.alternatives[activeAltIdx].name}
+                            </h4>
+                            <span className="text-[7.5px] font-mono font-semibold text-orange-400 bg-orange-500/10 border border-orange-500/20 px-1 py-0.5 rounded uppercase">
+                              {extra.alternatives[activeAltIdx].target}
+                            </span>
+                          </div>
+                          <p className="text-[10.5px] text-neutral-300 leading-snug font-sans mt-1.5 line-clamp-3" title={extra.alternatives[activeAltIdx].instructions.join(" ")}>
+                            {extra.alternatives[activeAltIdx].instructions[0] || "Execute with absolute posture control."}
+                          </p>
+                        </>
+                      )}
+                    </div>
+ 
                     {/* Google execution search helper button */}
                     <a
                       href={extra.googleSearchUrl}
