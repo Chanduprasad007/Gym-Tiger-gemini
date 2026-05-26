@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="tiger-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+    <linearGradient id="dark-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#171717"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Outer Rounded Shield -->
+  <rect x="12" y="12" width="488" height="488" rx="112" fill="url(#dark-grad)" stroke="#ea580c" stroke-width="12"/>
+  
+  <!-- Backing Glow Circular Background -->
+  <circle cx="256" cy="256" r="185" fill="url(#tiger-grad)"/>
+  
+  <!-- Outer Tiger Stripes on Left Side -->
+  <path d="M 90,180 Q 155,195 135,225 Q 155,245 100,265" fill="none" stroke="#171717" stroke-width="14" stroke-linecap="round" />
+  <path d="M 75,290 Q 140,300 120,325 Q 140,340 85,360" fill="none" stroke="#171717" stroke-width="14" stroke-linecap="round" />
+  
+  <!-- Outer Tiger Stripes on Right Side -->
+  <path d="M 422,180 Q 357,195 377,225 Q 357,245 412,265" fill="none" stroke="#171717" stroke-width="14" stroke-linecap="round" />
+  <path d="M 437,290 Q 372,300 392,325 Q 372,340 427,360" fill="none" stroke="#171717" stroke-width="14" stroke-linecap="round" />
+
+  <!-- Barbell Graphic -->
+  <rect x="156" y="246" width="200" height="20" rx="10" fill="#f5f5f5" stroke="#171717" stroke-width="4"/>
+  
+  <!-- Barbell Plates Left -->
+  <rect x="116" y="210" width="30" height="92" rx="8" fill="#171717" stroke="#f5f5f5" stroke-width="3"/>
+  <rect x="146" y="226" width="10" height="60" rx="4" fill="#171717" stroke="#f5f5f5" stroke-width="2"/>
+  
+  <!-- Barbell Plates Right -->
+  <rect x="366" y="210" width="30" height="92" rx="8" fill="#171717" stroke="#f5f5f5" stroke-width="3"/>
+  <rect x="356" y="226" width="10" height="60" rx="4" fill="#171717" stroke="#f5f5f5" stroke-width="2"/>
+
+  <!-- Tiger Eyes -->
+  <polygon points="160,150 220,175 185,185" fill="#f5f5f5" stroke="#171717" stroke-width="4"/>
+  <polygon points="352,150 292,175 327,185" fill="#f5f5f5" stroke="#171717" stroke-width="4"/>
+  <!-- Glowing Pupils -->
+  <polygon points="180,165 200,172 192,176" fill="#ea580c"/>
+  <polygon points="332,165 312,172 320,176" fill="#ea580c"/>
+  
+  <!-- Tiger Nose -->
+  <polygon points="256,215 236,185 276,185" fill="#171717"/>
+  
+  <!-- Mouth Curves -->
+  <path d="M 256,215 Q 256,238 234,244" fill="none" stroke="#171717" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 256,215 Q 256,238 278,244" fill="none" stroke="#171717" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Center Forehead Stripes -->
+  <path d="M 256,65 L 256,115" stroke="#171717" stroke-width="12" stroke-linecap="round"/>
+  <path d="M 236,75 L 256,100 L 276,75" fill="none" stroke="#171717" stroke-width="10" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,87 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- User Profiles ---
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(incoming());
+      allow update: if isOwner(userId) && isValidUserUpdate(incoming(), existing());
+      allow delete: if false; // Profiles cannot be self-deleted in app
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['userId', 'email', 'displayName', 'streak', 'totalWorkouts', 'updatedAt'])
+             && (data.keys().size() == 6 || (data.keys().size() == 7 && data.keys().hasAll(['lastCompletedDate'])))
+             && data.userId == request.auth.uid
+             && data.email is string
+             && data.displayName is string
+             && data.streak is int
+             && data.streak >= 0
+             && data.totalWorkouts is int
+             && data.totalWorkouts >= 0
+             && (data.keys().size() == 6 || data.lastCompletedDate == null || data.lastCompletedDate is string);
+    }
+
+    function isValidUserUpdate(data, oldData) {
+      return data.userId == oldData.userId
+             && data.email == oldData.email
+             && data.displayName is string
+             && data.streak is int
+             && data.streak >= 0
+             && data.totalWorkouts is int
+             && data.totalWorkouts >= 0
+             && (!data.keys().hasAll(['lastCompletedDate']) || data.lastCompletedDate == null || data.lastCompletedDate is string);
+    }
+
+    // --- Workout Logs ---
+    match /users/{userId}/workouts/{logId} {
+      allow list: if isOwner(userId);
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidId(logId) && isValidWorkoutLog(incoming());
+      allow update: if isOwner(userId) && isValidId(logId) && isValidWorkoutLog(incoming());
+      allow delete: if isOwner(userId) && isValidId(logId);
+    }
+
+    function isValidWorkoutLog(data) {
+      return data.keys().hasAll(['logId', 'userId', 'workoutName', 'dayIndex', 'completedAt', 'duration', 'exercises'])
+             && data.keys().size() == 7
+             && data.userId == request.auth.uid
+             && data.logId is string
+             && data.workoutName is string
+             && data.workoutName.size() <= 100
+             && data.dayIndex is int
+             && data.dayIndex >= 0 && data.dayIndex <= 5
+             && data.duration is int
+             && data.duration >= 0
+             && data.exercises is list
+             && data.exercises.size() <= 30; // Max 30 exercises per workout
+    }
+  }
+}
