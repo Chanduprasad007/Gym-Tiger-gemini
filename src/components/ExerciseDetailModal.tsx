@@ -51,6 +51,9 @@ export default function ExerciseDetailModal({ exercise, onClose }: ExerciseDetai
             <span className="text-[10px] font-mono bg-orange-500/10 text-orange-400 border border-orange-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
               {exercise.category} Isolation
             </span>
+            <span className="ml-1.5 text-[10px] font-mono bg-neutral-950 text-neutral-400 border border-neutral-850 px-2 py-0.5 rounded-full inline-block">
+              ⏱️ {exercise.rest} Rest
+            </span>
             <h2 className="text-lg font-extrabold text-white mt-1 uppercase tracking-tight">{exercise.name}</h2>
           </div>
           <button

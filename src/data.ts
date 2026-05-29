@@ -2,12 +2,13 @@ export interface Exercise {
   id: string;
   name: string;
   target: string;
-  category: "Lats" | "Shoulders" | "Chest" | "Core/Abs" | "Lower Back" | "Arms" | "Legs";
+  category: string;
   sets: number;
   repsRange: string;
-  restSeconds: number;
+  rest: string;
   instructions: string[];
   tigerTip: string;
+  alternatives: string[];
 }
 
 export interface DayWorkout {
@@ -19,443 +20,389 @@ export interface DayWorkout {
   exercises: Exercise[];
 }
 
-export const GYM_TIGER_SPLIT: DayWorkout[] = [
-  {
-    dayIndex: 0,
-    dayName: "Day 1",
-    title: "Lat Width & Side Delts",
-    description: "Build an expansive V-taper while expanding the collarbone profile.",
-    focus: ["Lat Width", "Shoulder Caps", "Upright Posture"],
-    exercises: [
-      {
-        id: "lats-pulldowns",
-        name: "Wide-Grip Lat Pulldown",
-        target: "Lats (Upper/Outer)",
-        category: "Lats",
-        sets: 4,
-        repsRange: "10-12 reps",
-        restSeconds: 90,
-        instructions: [
-          "Sit firmly in the machine, securing thighs under the pads.",
-          "Grasp the bar with a wide overhand grip, chest lifted and back slightly arched.",
-          "Pull the bar down toward your upper chest, leading with your elbows.",
-          "Squeeze your shoulder blades tightly at the bottom before releasing under full control."
-        ],
-        tigerTip: "Do not pull with your hands. Imagine your hands are hooks and pull entirely from the elbows."
-      },
-      {
-        id: "pullups-weighted",
-        name: "Posture Pullups (Bodyweight/Weighted)",
-        target: "Mid-Lats & Rhomboids",
-        category: "Lats",
-        sets: 3,
-        repsRange: "6-10 reps",
-        restSeconds: 120,
-        instructions: [
-          "Hang with a grip slightly wider than shoulder-width.",
-          "Contract your core, keep your legs straight, and depress your scapula.",
-          "Pull yourself up until your throat clears the bar, driving your chest towards it.",
-          "Control the descent completely to a dead hang."
-        ],
-        tigerTip: "Avoid crossing your legs or swinging. A rigid, straight bodyline protects the lower back and increases lateral recruit."
-      },
-      {
-        id: "lateral-raises",
-        name: "Lu Raises (High lateral raise)",
-        target: "Side Delts & Traps",
-        category: "Shoulders",
-        sets: 4,
-        repsRange: "12-15 reps",
-        restSeconds: 75,
-        instructions: [
-          "Stand tall holding light dumbbells at your sides with palms facing forward.",
-          "Raise the weights out to your sides in a wide arc, passing parallel.",
-          "Keep lifting all the way up until the dumbbells meet overhead, rotating your arms outward slightly.",
-          "Reverse the arc exactly, controlling the negative phase back down."
-        ],
-        tigerTip: "Originated by Olympian Lu Xiaojun. This wide, full-range arc opens the thoracic spine while sculpting round shoulder caps."
-      },
-      {
-        id: "face-pulls",
-        name: "Postural Face Pulls with Rope",
-        target: "Rear Delts, Rotator Cuff, Upper Back",
-        category: "Shoulders",
-        sets: 3,
-        repsRange: "15 reps",
-        restSeconds: 60,
-        instructions: [
-          "Set cable pulley to eye height and grab the rope handles with thumbs facing back.",
-          "Step back to lift the weight, standing with athletic posture.",
-          "Pull the center rope towards your forehead while tearing the sides apart.",
-          "Ensure your hands finish further back than your elbows in a double-bicep pose."
-        ],
-        tigerTip: "Hold the peak contraction for 2 full seconds to reinforce upright scapular posture and reverse slouching."
-      },
-      {
-        id: "core-plank-bracing",
-        name: "Hardstyle RKC Plank (Bracing)",
-        target: "Deep Core & Transverse Abdominis",
-        category: "Core/Abs",
-        sets: 3,
-        repsRange: "20-30s hold",
-        restSeconds: 60,
-        instructions: [
-          "Get into a forearm plank. Keep elbows exactly under your shoulders.",
-          "Clench your fists, lock your knees, and squeeze your glutes fully.",
-          "Consciously pull your elbows down towards your feet and your toes up towards your head.",
-          "Breathe in sharp, powerful cycles while maintaining maximal full-body tension."
-        ],
-        tigerTip: "This is not standard passive plank. Every muscle should be shaking from active bracing. A phenomenal spine-protecting tool."
-      }
-    ]
-  },
-  {
-    dayIndex: 1,
-    dayName: "Day 2",
-    title: "Chest Strength & Rear Delts",
-    description: "Develop structural front-to-back symmetry and heavy pressing push power.",
-    focus: ["Chest Strength", "Rear Delts", "Scapular Control"],
-    exercises: [
-      {
-        id: "chest-incline-press",
-        name: "Incline Dumbbell Press",
-        target: "Upper Chest & Front Delts",
-        category: "Chest",
-        sets: 4,
-        repsRange: "8-10 reps",
-        restSeconds: 90,
-        instructions: [
-          "Set bench to an incline of 30 degrees (prevent excessive shoulder takeover).",
-          "Sit down, press weights overhead, and tuck shoulder blades safely down and back.",
-          "Lower weights slowly toward your collarbones, feeling a deep stretch across the upper chest.",
-          "Drive upward with control, stopping just short of locking your elbows."
-        ],
-        tigerTip: "Keep your feet screwed into the floor and maintain a small arch in the lower back to establish structural strength."
-      },
-      {
-        id: "rear-delt-flyes",
-        name: "Prone Retraction Rear Delt Flyes",
-        target: "Rear Delts",
-        category: "Shoulders",
-        sets: 4,
-        repsRange: "12-15 reps",
-        restSeconds: 75,
-        instructions: [
-          "Lie face down on an incline bench at 30 degrees.",
-          "Hold dumbbells straight down, knuckles facing outward.",
-          "Raise weights out to the sides, driving with the back of your shoulders.",
-          "Avoid squeezing the neck; focus strictly on shoulder blade movement."
-        ],
-        tigerTip: "A vital builder to counteract heavy chest pressing and maintain robust shoulder posture."
-      },
-      {
-        id: "chest-dips",
-        name: "Bodyweight Chest Dips",
-        target: "Lower Chest, Sternal Fibers & Triceps",
-        category: "Chest",
-        sets: 3,
-        repsRange: "8-12 reps",
-        restSeconds: 90,
-        instructions: [
-          "Grasp dip bars and push yourself up to the starting position.",
-          "Incline your chest forward by tucking your chin and crossing your legs.",
-          "Lower yourself slowly until your elbows reach 90 degrees.",
-          "Drive back up using your chest, focusing on squeezing your hands together in mind-to-muscle connection."
-        ],
-        tigerTip: "Do not let your shoulders shrug up to your ears. Keep them depressed throughout to guard the rotator cuffs."
-      },
-      {
-        id: "dumbbell-pullover",
-        name: "Ribcage Expansion Pullover",
-        target: "Lower Chest, Lats & Serratus",
-        category: "Chest",
-        sets: 3,
-        repsRange: "10-12 reps",
-        restSeconds: 75,
-        instructions: [
-          "Lie perpendicular across a flat bench, upper back supported by the pad.",
-          "Hold a dumbbell overhead with both hands forming a diamond grip.",
-          "Keep arms mostly straight and lower the dumbbell back-and-down behind your head under strict control.",
-          "Pull the weight back up to eye level, contracting chest and serratus muscles."
-        ],
-        tigerTip: "Hips should be dropped slightly throughout to increase the stretch on the ribcage and expand overall posture."
-      }
-    ]
-  },
-  {
-    dayIndex: 2,
-    dayName: "Day 3",
-    title: "Postural Spine & Abs",
-    description: "Anti-slouch restoration and total-core bracing under tension.",
-    focus: ["Posterior Health", "Anti-rotation Abs", "Thoracic Extension"],
-    exercises: [
-      {
-        id: "core-hanging-raises",
-        name: "Hanging Leg Raises",
-        target: "Rectus Abdominis & Deep Hip Flexors",
-        category: "Core/Abs",
-        sets: 4,
-        repsRange: "10-12 reps",
-        restSeconds: 90,
-        instructions: [
-          "Hang from a pullup bar with a shoulder-width grip.",
-          "Contract your core, lock your legs out, and lift them slowly until they are parallel to the floor.",
-          "Pause for a brief microsecond before lowering them with controlled discipline.",
-          "Avoid swinging completely; do not rely on momentum."
-        ],
-        tigerTip: "To target abs rather than just hip flexors, concentrate on curling the pelvis upward towards the ribs."
-      },
-      {
-        id: "farmer-carries",
-        name: "Posture Heavy Farmer's Carries",
-        target: "Trapezius, Core Stabilizers & Forearms",
-        category: "Lower Back",
-        sets: 3,
-        repsRange: "40-50 meters",
-        restSeconds: 90,
-        instructions: [
-          "Deadlift two heavy dumbbells or kettlebells to a standing lock-out.",
-          "Pack your shoulders down and back, lengthen your neck, and brace your code.",
-          "Walk in a straight line with slow, deliberate, heel-to-toe steps.",
-          "Do not allow the spine to wobble laterally; carry yourself tall."
-        ],
-        tigerTip: "One of the most primitive, functional, and posture-friendly strength movements. It binds the entire body into a cohesive unit."
-      },
-      {
-        id: "core-paloff",
-        name: "Anti-Rotation Pallof Press",
-        target: "Obliques & Core Bracing",
-        category: "Core/Abs",
-        sets: 3,
-        repsRange: "12 reps per side",
-        restSeconds: 60,
-        instructions: [
-          "Set a cable pulley to chest height and stand side-on to the machine.",
-          "Grasp the handle with both hands next to your sternum, feet shoulder-width.",
-          "Press the handle straight outward, defying the sideways pull of the cable.",
-          "Hold for 2 seconds with hands fully extended, then return smoothly."
-        ],
-        tigerTip: "This is anti-rotation training. The magic lies in preventing your spine from twisting outward, loading deep core."
-      },
-      {
-        id: "bird-dogs",
-        name: "Primal Cross-Bracing Bird Dogs",
-        target: "Erector Spinae & Glute-Shoulder Bracing",
-        category: "Lower Back",
-        sets: 3,
-        repsRange: "10 holds per side",
-        restSeconds: 45,
-        instructions: [
-          "Get into a quadruped position on hands and knees with flat neutral spine.",
-          "Reach one arm straight forward while extending the opposite leg directly backward.",
-          "Keep hips pointing squared to the ground; don't twist open.",
-          "Hold for 3 seconds, fully tensing the posterior line from heel to fingertip."
-        ],
-        tigerTip: "A pillar of Spinal Rehab pioneer Stuart McGill's 'Big Three'. Restores glute-lower-back firing patterns instantly."
-      }
-    ]
-  },
-  {
-    dayIndex: 3,
-    dayName: "Day 4",
-    title: "Lower Back & Hinge Power",
-    description: "Maximize posterior kinetic chain strength and absolute lower back protection.",
-    focus: ["Lower Back Power", "Glutes & Hamstrings", "Spine Stabilization"],
-    exercises: [
-      {
-        id: "posterior-rdl",
-        name: "Db Romanian Deadlifts (RDLs)",
-        target: "Hamstrings, Glutes & Erector Spinae",
-        category: "Lower Back",
-        sets: 4,
-        repsRange: "8-10 reps",
-        restSeconds: 120,
-        instructions: [
-          "Stand tall holding dumbbells in front of thighs. Soften your knees just slightly.",
-          "Hinge at your hips, pushing them straight backward as you slide weights down your shins.",
-          "Keep the spine completely flat and neck neutral, matching the tilt.",
-          "Lower weights to mid-shin until you feel a deep hamstring stretch, then pull hips forward to stand."
-        ],
-        tigerTip: "Never round your lower back. The movement is vertical/horizontal hip translation, NOT spine bending."
-      },
-      {
-        id: "back-extensions",
-        name: "45-Degree Back Extensions",
-        target: "Erector Spinae, Glutes & Hamstrings",
-        category: "Lower Back",
-        sets: 3,
-        repsRange: "12-15 reps",
-        restSeconds: 75,
-        instructions: [
-          "Position your hips snug against the pad of a 45-degree extension bench.",
-          "Hinge forward at the hips, keeping your spine straight and hands crossed over chest.",
-          "Rise smoothly back to alignment, utilizing glutes and spine erectors.",
-          "Squeeze hard at the top of the range. Do not hyperextend at the peak."
-        ],
-        tigerTip: "Focus on pivoting from the hip crease. Rounding the upper back slightly at the bottom targets lower glutes/hamstrings more, keeping lower back healthy."
-      },
-      {
-        id: "good-mornings",
-        name: "Dumbbell Good Mornings",
-        target: "Lower Back, Glutes & Hamstrings",
-        category: "Lower Back",
-        sets: 3,
-        repsRange: "10-12 reps",
-        restSeconds: 90,
-        instructions: [
-          "Stand with feet shoulder-width, cradling a dumbbell against your upper chest.",
-          "Send your hips back, bowing forward slowly while keeping a flat back.",
-          "Maintain a slight knee bend throughout the entire arc.",
-          "Stop once your chest is nearly parallel to the floor, then return by contracting lower-body posterior muscles."
-        ],
-        tigerTip: "A magnificent hinge. Start light, prioritize complete core bracing, and search for the hamstring stretch."
-      },
-      {
-        id: "kettlebell-carries",
-        name: "Suitcase Hold (Single Kettlebell Carry)",
-        target: "Lateral Core Stability & Spine Align",
-        category: "Core/Abs",
-        sets: 3,
-        repsRange: "30 meters per side",
-        restSeconds: 60,
-        instructions: [
-          "Hold a single heavy kettlebell or dumbbell in one hand, leaving the other free.",
-          "Stand perfectly vertical, counteracting the heavy off-center pull.",
-          "Walk in stable, slow paces, keeping shoulders perfectly level.",
-          "Swap hands and repeat."
-        ],
-        tigerTip: "This is anti-lateral flexion. Your quadratus lumborum and obliques on the opposite side must fire violently to keep your posture straight as a spear."
-      }
-    ]
-  },
-  {
-    dayIndex: 4,
-    dayName: "Day 5",
-    title: "Shoulder Caps & Arms",
-    description: "Isolate the upper body, framing your physique with dense, round shoulders.",
-    focus: ["Shoulder Caps", "Biceps & Triceps", "Collarbone Width"],
-    exercises: [
-      {
-        id: "shoulder-db-press",
-        name: "Seated Dumbbell Shoulder Press",
-        target: "Anterior & Lateral Deltoids",
-        category: "Shoulders",
-        sets: 4,
-        repsRange: "8-12 reps",
-        restSeconds: 90,
-        instructions: [
-          "Sit on a high-backed bench, holding dumbbells at shoulder level with hand grips angled slightly.",
-          "Press dumbbells straight up, converging them together slightly overhead.",
-          "Lower back down to ears with full muscular control, avoiding dropping them.",
-          "Ensure your elbows stay tucked in the scapular plane (approx 30 degrees forward)."
-        ],
-        tigerTip: "Tucking elbows slightly forward shields the shoulders from impingement, maximizing delta-recruitment."
-      },
-      {
-        id: "dumbbell-bicep-curls",
-        name: "Incline Dumbbell Supination Curls",
-        target: "Biceps Brachii (Long Head)",
-        category: "Arms",
-        sets: 3,
-        repsRange: "10-12 reps",
-        restSeconds: 75,
-        instructions: [
-          "Sit on an incline bench set to 45 degrees, arms hanging straight down.",
-          "Curl dumbbells up, rotating (supinating) wrists outward so palms face you at the top.",
-          "Keep elbows pinned backward throughout the entire range.",
-          "Stretch biceps fully at the bottom of each rep."
-        ],
-        tigerTip: "The incline pre-stretches the long head of the bicep, leading to deeper growth potential and peak isolation."
-      },
-      {
-        id: "tricep-pushdown",
-        name: "Rope Triceps Pushdown (Flared)",
-        target: "Triceps (Lateral & Medial)",
-        category: "Arms",
-        sets: 3,
-        repsRange: "12-15 reps",
-        restSeconds: 60,
-        instructions: [
-          "Step in close to the high cable with rope attached.",
-          "Keep upper arms locked strictly at your sides.",
-          "Drive elbows straight down, pushing hands toward feet.",
-          "At the bottom of the movement, peel the rope apart with your pinky fingers, locking out fully."
-        ],
-        tigerTip: "Splitting the rope flares the lateral heads, adding the classic broad silhouette back-arm profile."
-      },
-      {
-        id: "arms-hammer-curls",
-        name: "Hammer Grip Pinwheel Curls",
-        target: "Brachialis & Brachioradialis (Arm Thickness)",
-        category: "Arms",
-        sets: 3,
-        repsRange: "10-12 reps",
-        restSeconds: 75,
-        instructions: [
-          "Stand tall holding dumbbells with neutral grips (palms facing each other).",
-          "Curl one dumbbell across your torso towards the opposite shoulder.",
-          "Squeeze and control the negative, returning to the starting position.",
-          "Alternate arms smoothly."
-        ],
-        tigerTip: "Targets brachialis, which pushes up the outer biceps, contributing to a massive mid-arm visual size."
-      }
-    ]
-  },
-  {
-    dayIndex: 5,
-    dayName: "Day 6",
-    title: "Functional Posture & Athletic Recovery",
-    description: "Synthesize posture work and reinforce bulletproof joints.",
-    focus: ["Posterior Recovery", "Spine Decompression", "Joint Health"],
-    exercises: [
-      {
-        id: "rotational-turkish-getup",
-        name: "Light Turkish Get-Ups (TGU)",
-        target: "Spinal Stability, Shoulders & Posterior",
-        category: "Core/Abs",
-        sets: 3,
-        repsRange: "3 paths per side",
-        restSeconds: 90,
-        instructions: [
-          "Lie face-up on the floor with a dumbbell held straight up in your right hand.",
-          "Follow the technical sequencing: roll to elbow, rise to palm, lift hips, sweep knee back.",
-          "Lunge up to standing while constantly locking eyes on the overhead load.",
-          "Slowly reverse each stage back to the floor with total coordination."
-        ],
-        tigerTip: "Revered as the ultimate posture reset. Every rotator cuff, spine stabilizer, and lateral chain muscle must work together."
-      },
-      {
-        id: "recovery-dead-hangs",
-        name: "Thoracic Dead Hang Decompression",
-        target: "Spine Decompression & Grip Strength",
-        category: "Lats",
-        sets: 3,
-        repsRange: "30-45s hold",
-        restSeconds: 60,
-        instructions: [
-          "Grasp a pullup bar with a standard overhand grip.",
-          "Release all lower-body effort, letting gravity stretch your obliques, ribs, and back muscles.",
-          "Breathe deeply into your stomach, stretching your deep lat attachments.",
-          "Descend slowly without dropping heavily."
-        ],
-        tigerTip: "The ultimate spine saver. Relieves pressure between vertebrae after heavy Romanian Deadlifts and carries."
-      },
-      {
-        id: "recovery-bird-dogs",
-        name: "Alternating Slow Bird-Dogs (Rehab)",
-        target: "Spinal Health & Posterior Activation",
-        category: "Lower Back",
-        sets: 3,
-        repsRange: "12 slower reps",
-        restSeconds: 45,
-        instructions: [
-          "Set up on hands and knees with perfect alignment.",
-          "Extend opposite arm and leg, executing a 4-second hold at the peak.",
-          "Squeeze the fists and gluten to drive deep stability.",
-          "Return precisely beneath you and alternate."
-        ],
-        tigerTip: "Keeps spinal pressure minimal while flushing core supporting muscles with high-oxygen recovery circulation."
-      }
-    ]
-  }
+const focusTags = [
+  { label: "Wider Back", tone: "lime" },
+  { label: "Bigger Shoulders", tone: "orange" },
+  { label: "Stronger Lower Back", tone: "cyan" },
+  { label: "Chest + Abs Strength", tone: "lime" },
 ];
+
+const coachingRules = [
+  {
+    title: "Width Priority",
+    copy: "Pull-ups, wide-grip pulldowns, straight-arm pulldowns, pullovers, and cable laterals stay in the plan. These are your visual-width builders.",
+  },
+  {
+    title: "Lower Back Strength",
+    copy: "Deadlifts, RDLs, back extensions, good mornings, bird dogs, and carries build the hinge pattern without turning every day into a max-out day.",
+  },
+  {
+    title: "Abs Standard",
+    copy: "Train abs four times per week: weighted flexion, hanging raises, anti-extension, and anti-rotation. Progress them like normal lifts.",
+  },
+  {
+    title: "Progression",
+    copy: "Keep 1-2 reps in reserve on compounds. When every set reaches the top of the rep range with clean form, add 2.5 kg upper body or 5 kg lower body.",
+  },
+];
+
+const program = [
+  {
+    day: "Day A",
+    letter: "A",
+    title: "Chest + Triceps + Abs",
+    accent: "orange",
+    intent: "Heavy press strength, upper-chest volume, and weighted abs.",
+    exercises: [
+      ex("Barbell Bench Press", "4", "5-8", "2-3 min", "KEY", "Drive feet down, shoulder blades packed, bar to lower chest.", [
+        "Dumbbell Bench Press",
+        "Smith Machine Bench Press",
+        "Machine Chest Press",
+      ]),
+      ex("Incline Dumbbell Press", "3", "8-10", "90 sec", "KEY", "Use a 30 degree bench and keep elbows slightly tucked.", [
+        "Incline Smith Press",
+        "Incline Machine Press",
+        "Low-Incline Barbell Press",
+      ]),
+      ex("Cable Chest Fly", "3", "12-15", "60 sec", "CHEST", "Let the chest stretch, then hug wide without bending elbows more.", [
+        "Pec Deck Fly",
+        "Incline Cable Fly",
+        "Dumbbell Fly",
+      ]),
+      ex("Weighted Dips", "3", "8-12", "90 sec", "KEY", "Lean forward for chest. Use assistance if depth breaks.", [
+        "Assisted Dip Machine",
+        "Decline Dumbbell Press",
+        "Close-Grip Push-Up",
+      ]),
+      ex("Overhead Cable Triceps Extension", "3", "10-12", "60 sec", "TRI", "Elbows point forward. Stretch the long head fully.", [
+        "EZ-Bar Skull Crusher",
+        "Dumbbell Overhead Extension",
+        "Rope Pushdown",
+      ]),
+      ex("Rope Triceps Pushdown", "3", "12-15", "60 sec", "TRI", "Split the rope at lockout and pause for one second.", [
+        "Straight-Bar Pushdown",
+        "Cable Kickback",
+        "Machine Dip",
+      ]),
+      ex("Hanging Leg Raise", "3", "10-15", "45 sec", "ABS", "Posteriorly tilt the pelvis. No swinging.", [
+        "Captain's Chair Knee Raise",
+        "Bench Reverse Crunch",
+        "Lying Leg Raise",
+      ]),
+      ex("Cable Crunch", "3", "12-15", "45 sec", "ABS", "Round through the spine instead of pulling with arms.", [
+        "Machine Crunch",
+        "Decline Weighted Sit-Up",
+        "Stability Ball Crunch",
+      ]),
+    ],
+  },
+  {
+    day: "Day B",
+    letter: "B",
+    title: "Back + Biceps V-Taper",
+    accent: "cyan",
+    intent: "Lat width first, then rows, lower-back strength, and biceps.",
+    exercises: [
+      ex("Deadlift", "3", "3-5", "3 min", "KEY", "Brace hard, push the floor away, stop before form degrades.", [
+        "Trap Bar Deadlift",
+        "Rack Pull",
+        "Romanian Deadlift",
+      ]),
+      ex("Wide-Grip Lat Pulldown", "4", "8-12", "90 sec", "WIDTH", "Pull elbows down and out. Finish at upper chest.", [
+        "Assisted Wide-Grip Pull-Up",
+        "Neutral-Grip Pulldown",
+        "Machine High Row",
+      ]),
+      ex("Chest-Supported Row", "3", "8-12", "90 sec", "BACK", "Keep chest fixed and row elbows toward hips.", [
+        "Seated Cable Row",
+        "T-Bar Row",
+        "One-Arm Dumbbell Row",
+      ]),
+      ex("Straight-Arm Pulldown", "3", "12-15", "60 sec", "WIDTH", "Think armpits to hips, arms almost straight.", [
+        "Dumbbell Pullover",
+        "Cable Pullover",
+        "Machine Pullover",
+      ]),
+      ex("45-Degree Back Extension", "3", "12-15", "60 sec", "LOW BACK", "Hinge at hips. Squeeze glutes at the top.", [
+        "Reverse Hyperextension",
+        "Good Morning",
+        "Bird Dog",
+      ]),
+      ex("EZ-Bar Curl", "3", "8-12", "60 sec", "BICEPS", "Elbows stay near ribs. No hip swing.", [
+        "Barbell Curl",
+        "Cable Curl",
+        "Preacher Curl",
+      ]),
+      ex("Incline Dumbbell Curl", "2", "10-12", "60 sec", "BICEPS", "Start from a full stretch and keep shoulders back.", [
+        "Bayesian Cable Curl",
+        "Hammer Curl",
+        "Concentration Curl",
+      ]),
+      ex("Pallof Press", "3", "10-12/side", "45 sec", "ABS", "Resist rotation. Ribs down, glutes tight.", [
+        "Cable Woodchop",
+        "Dead Bug",
+        "Side Plank",
+      ]),
+    ],
+  },
+  {
+    day: "Day C",
+    letter: "C",
+    title: "Legs + Shoulder Width",
+    accent: "violet",
+    intent: "Strong legs plus lateral and rear delts for capped shoulders.",
+    exercises: [
+      ex("Front Squat", "4", "5-8", "2-3 min", "KEY", "Elbows high, full depth, brace before every rep.", [
+        "Back Squat",
+        "Hack Squat",
+        "Leg Press",
+      ]),
+      ex("Romanian Deadlift", "3", "8-10", "2 min", "LOW BACK", "Push hips back and keep lats locked.", [
+        "Dumbbell RDL",
+        "Good Morning",
+        "Seated Leg Curl",
+      ]),
+      ex("Leg Press", "3", "10-12", "90 sec", "LEGS", "Controlled depth, no knee lockout.", [
+        "Hack Squat",
+        "Smith Machine Squat",
+        "Bulgarian Split Squat",
+      ]),
+      ex("Seated Dumbbell Shoulder Press", "4", "6-10", "2 min", "KEY", "Press slightly back over ears. Do not overarch.", [
+        "Machine Shoulder Press",
+        "Barbell Overhead Press",
+        "Arnold Press",
+      ]),
+      ex("Cable Lateral Raise", "4", "12-20", "45 sec", "WIDTH", "Lead with elbows and keep tension behind the body.", [
+        "Dumbbell Lateral Raise",
+        "Machine Lateral Raise",
+        "Lean-Away Cable Raise",
+      ]),
+      ex("Face Pull", "3", "15-20", "45 sec", "REAR DELT", "Pull to eyebrow level, rotate thumbs back.", [
+        "Reverse Pec Deck",
+        "Cable Rear Delt Fly",
+        "Band Pull-Apart",
+      ]),
+      ex("Standing Calf Raise", "4", "12-20", "45 sec", "LEGS", "Deep stretch, hard pause at the top.", [
+        "Seated Calf Raise",
+        "Leg Press Calf Raise",
+        "Single-Leg Calf Raise",
+      ]),
+      ex("Ab Wheel Rollout", "3", "6-12", "60 sec", "ABS", "Ribs down. Only roll as far as your lower back stays neutral.", [
+        "Stability Ball Rollout",
+        "TRX Fallout",
+        "Body Saw Plank",
+      ]),
+    ],
+  },
+  {
+    day: "Day D",
+    letter: "D",
+    title: "Chest + Triceps V2",
+    accent: "orange",
+    intent: "Different chest angles, triceps overload, and anti-extension abs.",
+    exercises: [
+      ex("Dumbbell Bench Press", "4", "8-10", "2 min", "KEY", "Deep stretch, wrists stacked, press in a slight arc.", [
+        "Machine Chest Press",
+        "Barbell Bench Press",
+        "Smith Bench Press",
+      ]),
+      ex("Incline Cable Fly", "3", "12-15", "60 sec", "CHEST", "Low-to-high line for upper chest.", [
+        "Incline Dumbbell Fly",
+        "Pec Deck",
+        "Low Cable Fly",
+      ]),
+      ex("Decline Bench Press", "3", "8-10", "90 sec", "CHEST", "Keep shoulder blades pinned and touch lower chest.", [
+        "Weighted Dip",
+        "Decline Machine Press",
+        "Flat Dumbbell Press",
+      ]),
+      ex("Pec Deck Fly", "3", "12-15", "60 sec", "CHEST", "Pause at the squeeze, slow return.", [
+        "Cable Crossover",
+        "Dumbbell Fly",
+        "Push-Up",
+      ]),
+      ex("Close-Grip Bench Press", "3", "6-10", "2 min", "KEY", "Hands just inside shoulder width, elbows tucked.", [
+        "Smith Close-Grip Press",
+        "Machine Dip",
+        "Weighted Push-Up",
+      ]),
+      ex("EZ-Bar Skull Crusher", "3", "10-12", "60 sec", "TRI", "Upper arms angled back slightly to keep tension.", [
+        "Cable Skull Crusher",
+        "Overhead Dumbbell Extension",
+        "Rope Pushdown",
+      ]),
+      ex("Weighted Plank", "3", "40-60 sec", "45 sec", "ABS", "Brace like a heavy squat. No hip sag.", [
+        "RKC Plank",
+        "Body Saw",
+        "Dead Bug",
+      ]),
+      ex("Decline Sit-Up", "3", "12-15", "45 sec", "ABS", "Add a plate only after strict control.", [
+        "Cable Crunch",
+        "Machine Crunch",
+        "Weighted Crunch",
+      ]),
+    ],
+  },
+  {
+    day: "Day E",
+    letter: "E",
+    title: "Back + Biceps V2",
+    accent: "cyan",
+    intent: "Second lat-width day with heavy rows and controlled lower-back work.",
+    exercises: [
+      ex("Pull-Up", "4", "6-10", "2 min", "WIDTH", "Use assistance until reps are clean. Add weight later.", [
+        "Assisted Pull-Up",
+        "Wide-Grip Pulldown",
+        "Neutral-Grip Pulldown",
+      ]),
+      ex("T-Bar Row", "4", "6-10", "2 min", "KEY", "Brace, pull to lower ribs, do not turn it into a shrug.", [
+        "Chest-Supported Row",
+        "Barbell Row",
+        "Machine Row",
+      ]),
+      ex("Single-Arm Cable Row", "3", "10-12/side", "75 sec", "BACK", "Reach forward for stretch, elbow drives to hip.", [
+        "One-Arm Dumbbell Row",
+        "Iso-Lateral Row Machine",
+        "Seated Cable Row",
+      ]),
+      ex("Dumbbell Pullover", "3", "10-12", "75 sec", "WIDTH", "Open lats through a long stretch. Keep ribs controlled.", [
+        "Straight-Arm Pulldown",
+        "Machine Pullover",
+        "Cable Pullover",
+      ]),
+      ex("Good Morning", "3", "8-10", "90 sec", "LOW BACK", "Light to moderate load. Hinge, do not squat.", [
+        "Back Extension",
+        "Romanian Deadlift",
+        "Hip Thrust",
+      ]),
+      ex("Preacher Curl", "3", "10-12", "60 sec", "BICEPS", "Full extension, no shoulder movement.", [
+        "Cable Preacher Curl",
+        "EZ-Bar Curl",
+        "Machine Curl",
+      ]),
+      ex("Hammer Curl", "3", "10-12", "60 sec", "BICEPS", "Neutral grip for brachialis and forearm thickness.", [
+        "Rope Hammer Curl",
+        "Cross-Body Hammer Curl",
+        "Reverse Curl",
+      ]),
+      ex("Cable Woodchop", "3", "10-12/side", "45 sec", "ABS", "Rotate through trunk while hips stay controlled.", [
+        "Pallof Press",
+        "Russian Twist",
+        "Side Plank Rotation",
+      ]),
+    ],
+  },
+  {
+    day: "Day F",
+    letter: "F",
+    title: "Shoulders + Legs + Core",
+    accent: "violet",
+    intent: "Shoulder mass, traps, legs, and a final core/lower-back finish.",
+    exercises: [
+      ex("Seated Barbell Military Press", "4", "5-8", "2-3 min", "KEY", "Press from upper chest to overhead with ribs stacked.", [
+        "Dumbbell Shoulder Press",
+        "Machine Shoulder Press",
+        "Standing Overhead Press",
+      ]),
+      ex("Arnold Press", "3", "8-10", "90 sec", "SHOULDER", "Rotate smoothly and avoid rushing the bottom.", [
+        "Dumbbell Shoulder Press",
+        "Machine Press",
+        "Landmine Press",
+      ]),
+      ex("Machine Lateral Raise", "4", "12-20", "45 sec", "WIDTH", "High reps, strict control, no trap takeover.", [
+        "Cable Lateral Raise",
+        "Dumbbell Lateral Raise",
+        "Lean-Away Lateral Raise",
+      ]),
+      ex("Reverse Pec Deck", "3", "15-20", "45 sec", "REAR DELT", "Hands wide, chest fixed, squeeze rear delts.", [
+        "Face Pull",
+        "Cable Rear Delt Fly",
+        "Incline Rear Delt Raise",
+      ]),
+      ex("Heavy Barbell Shrug", "3", "8-12", "90 sec", "TRAPS", "Straight up and down. Pause at top.", [
+        "Dumbbell Shrug",
+        "Smith Machine Shrug",
+        "Trap Bar Shrug",
+      ]),
+      ex("Back Squat", "4", "6-10", "2-3 min", "KEY", "Brace, full depth, controlled eccentric.", [
+        "Hack Squat",
+        "Leg Press",
+        "Smith Machine Squat",
+      ]),
+      ex("Lying Leg Curl", "3", "10-15", "60 sec", "LEGS", "Hips pressed down and hamstrings squeezed.", [
+        "Seated Leg Curl",
+        "Romanian Deadlift",
+        "Nordic Curl",
+      ]),
+      ex("Farmer's Carry", "4", "30-40 m", "75 sec", "CORE", "Tall posture, hard brace, heavy handles.", [
+        "Suitcase Carry",
+        "Trap Bar Carry",
+        "Dumbbell Hold",
+      ]),
+      ex("Bird Dog", "2", "10/side", "30 sec", "LOW BACK", "Slow reach, no hip rotation, neutral spine.", [
+        "Dead Bug",
+        "McGill Curl-Up",
+        "Side Plank",
+      ]),
+    ],
+  },
+];
+
+function ex(
+  name: string,
+  sets: string,
+  reps: string,
+  rest: string,
+  tag: string,
+  cue: string,
+  alternatives: string[]
+) {
+  return { name, sets, reps, rest, tag, cue, alternatives };
+}
+
+const categoryMap: Record<string, string> = {
+  KEY: "Compound",
+  CHEST: "Chest",
+  TRI: "Triceps",
+  ABS: "Core/Abs",
+  WIDTH: "Lat Width",
+  BACK: "Mid Back",
+  "LOW BACK": "Lower Back",
+  BICEPS: "Biceps",
+  "REAR DELT": "Rear Delt",
+  LEGS: "Legs",
+  SHOULDER: "Shoulders",
+  TRAPS: "Traps",
+};
+
+export const GYM_TIGER_SPLIT: DayWorkout[] = program.map((day, index) => {
+  return {
+    dayIndex: index,
+    dayName: day.day,
+    title: day.title,
+    description: day.intent,
+    focus: Array.from(new Set(day.exercises.map((e) => categoryMap[e.tag] || e.tag))),
+    exercises: day.exercises.map((e, eIndex) => {
+      const slug = e.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      const instructions = e.cue
+        .split(/,\s*|\.\s*/)
+        .filter(Boolean)
+        .map((s) => s.trim().charAt(0).toUpperCase() + s.trim().slice(1));
+
+      return {
+        id: `${slug}-${eIndex}`,
+        name: e.name,
+        target: categoryMap[e.tag] || e.tag,
+        category: categoryMap[e.tag] || e.tag,
+        sets: parseInt(e.sets) || 3,
+        repsRange: e.reps,
+        rest: e.rest,
+        instructions: instructions.length > 0 ? instructions : [e.cue],
+        tigerTip: e.cue,
+        alternatives: e.alternatives || [],
+      };
+    }),
+  };
+});
+
+export { coachingRules, focusTags, program };

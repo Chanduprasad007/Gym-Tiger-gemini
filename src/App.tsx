@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { GYM_TIGER_SPLIT, Exercise, DayWorkout } from "./data";
+import { GYM_TIGER_SPLIT, Exercise, DayWorkout, coachingRules, focusTags } from "./data";
 import { UserStats, WorkoutLog } from "./types";
 import { db, auth, provider, isFirebaseAvailable, handleFirestoreError, OperationType, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "./lib/firebase";
 import { onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
@@ -757,6 +757,24 @@ export default function App() {
               Gym Tiger is an elite training engine delivering localized lateral lat width, chest width, anti-rotation core raises, and spinal support carries.
             </p>
             
+            {/* focusTags visual badges */}
+            <div className="flex flex-wrap gap-2 mt-4">
+              <span className="text-[9px] font-mono font-bold text-neutral-500 uppercase tracking-widest self-center mr-1">Current Focus:</span>
+              {focusTags.map((tag, idx) => {
+                const colors: Record<string, string> = {
+                  lime: "bg-lime-500/10 text-lime-400 border-lime-500/20",
+                  orange: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+                  cyan: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20"
+                };
+                const colorClass = colors[tag.tone] || "bg-neutral-500/10 text-neutral-400 border-neutral-500/20";
+                return (
+                  <span key={idx} className={`text-[10px] font-bold px-2.5 py-1 border rounded-full ${colorClass}`}>
+                    {tag.label}
+                  </span>
+                );
+              })}
+            </div>
+            
             {/* Quick Profile Modifier trigger */}
             <div className="mt-3 flex gap-2">
               <button
@@ -832,6 +850,16 @@ export default function App() {
               );
             })}
           </div>
+        </section>
+
+        {/* V-Taper Coaching Rules blueprint corner */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {coachingRules.map((rule, idx) => (
+            <div key={idx} className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-4.5 shadow-md flex flex-col gap-2 hover:border-neutral-700 transition-colors">
+              <span className="text-[10px] font-mono font-black text-orange-500 uppercase tracking-wider">{rule.title}</span>
+              <p className="text-xs text-neutral-400 leading-relaxed font-sans">{rule.copy}</p>
+            </div>
+          ))}
         </section>
 
         {/* Tab switcher navigation bar */}

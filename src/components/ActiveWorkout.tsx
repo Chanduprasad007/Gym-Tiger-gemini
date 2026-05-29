@@ -286,6 +286,9 @@ function ActiveExerciseCard({
           <span className="px-2 py-0.5 text-[10px] bg-orange-500/10 text-orange-400 border border-orange-500/15 font-mono font-bold rounded-md uppercase tracking-wider">
             {ex.category}
           </span>
+          <span className="ml-1.5 px-2 py-0.5 text-[10px] bg-neutral-950 text-neutral-400 border border-neutral-800 font-mono rounded-md inline-block">
+            ⏱️ {ex.rest}
+          </span>
           <h3 className="text-sm font-bold text-white mt-1 uppercase tracking-tight group-hover:text-orange-400 transition-colors">
             {ex.name}
           </h3>
