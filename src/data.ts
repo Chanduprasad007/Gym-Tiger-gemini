@@ -18,6 +18,7 @@ export interface DayWorkout {
   description: string;
   focus: string[];
   exercises: Exercise[];
+  accent?: string;
 }
 
 const focusTags = [
@@ -382,6 +383,7 @@ export const GYM_TIGER_SPLIT: DayWorkout[] = program.map((day, index) => {
     title: day.title,
     description: day.intent,
     focus: Array.from(new Set(day.exercises.map((e) => categoryMap[e.tag] || e.tag))),
+    accent: day.accent,
     exercises: day.exercises.map((e, eIndex) => {
       const slug = e.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
       const instructions = e.cue
