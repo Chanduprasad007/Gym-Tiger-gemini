@@ -86,7 +86,7 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Gym Tiger back-end proxy running on http://0.0.0.0:${PORT}`);
+    console.log(`Gym - Gemini back-end proxy running on http://0.0.0.0:${PORT}`);
   });
 }
 
