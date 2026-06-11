@@ -1,6 +1,0 @@
-{
-  "name": "Gym Tiger",
-  "description": "An elite six-day hypertrophy and functional split tracker designed for high performance.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
