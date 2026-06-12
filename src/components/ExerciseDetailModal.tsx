@@ -60,10 +60,10 @@ export default function ExerciseDetailModal({ exercise, onClose }: ExerciseDetai
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-neutral-400 hover:text-white bg-white/3 hover:bg-white/5 border border-white/5 rounded-xl transition-all cursor-pointer"
+            className="p-3.5 md:p-2 text-neutral-400 hover:text-white bg-white/3 hover:bg-white/5 border border-white/5 rounded-xl transition-all cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
             title="Close Guide"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5 md:w-4 md:h-4" />
           </button>
         </div>
 

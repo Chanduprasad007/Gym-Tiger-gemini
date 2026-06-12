@@ -449,7 +449,7 @@ export default function App() {
 
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-200 flex flex-col font-sans relative pb-12 overflow-hidden animate-fade-in" id="gym-gemini-root">
+    <div className="min-h-screen bg-neutral-950 text-neutral-200 flex flex-col font-sans relative pb-28 md:pb-12 overflow-hidden animate-fade-in" id="gym-gemini-root">
       {/* Background Animated Blobs */}
       <div className="absolute top-[-10%] left-[-15%] w-[60vw] h-[60vw] max-w-[600px] bg-pink-500/10 rounded-full blur-[140px] animate-blob-1 pointer-events-none z-0" />
       <div className="absolute bottom-[-10%] right-[-15%] w-[60vw] h-[60vw] max-w-[600px] bg-lime-500/10 rounded-full blur-[140px] animate-blob-2 pointer-events-none z-0" />
@@ -651,7 +651,7 @@ export default function App() {
 
 
         {/* Tab switcher navigation bar */}
-        <div className="flex border-b border-white/5 gap-6 mb-6">
+        <div className="hidden md:flex border-b border-white/5 gap-6 mb-6">
           <button
             onClick={() => setActiveTab("splits")}
             className={`pb-3 font-bold text-sm uppercase tracking-wider flex items-center gap-2 transition-all relative ${
@@ -690,15 +690,15 @@ export default function App() {
               transition={{ duration: 0.2 }}
               className="flex flex-col gap-6"
             >
-              {/* Category Filter Pills */}
-              <div className="flex flex-wrap gap-2 pb-3 border-b border-white/5">
+              {/* Category Filter Pills - Swipeable Chip Group */}
+              <div className="flex overflow-x-auto whitespace-nowrap pb-3 border-b border-white/5 gap-2.5 scrollbar-none snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0">
                 {["All Workouts", "Back & Lats", "Shoulders", "Chest & Abs", "Legs"].map((cat) => {
                   const isActive = activeCategory === cat || (cat === "All Workouts" && activeCategory === "All");
                   return (
                     <button
                       key={cat}
                       onClick={() => setActiveCategory(cat === "All Workouts" ? "All" : cat)}
-                      className={`px-4 py-2.5 rounded-xl text-xs font-mono font-black uppercase tracking-wider transition-all border ${
+                      className={`px-5 py-3.5 rounded-2xl text-xs md:text-sm font-mono font-black uppercase tracking-wider transition-all border snap-start min-h-[44px] cursor-pointer select-none active:scale-95 ${
                         isActive
                           ? "bg-pink-500/10 text-pink-400 border-pink-500/40 glow-pink"
                           : "bg-white/3 border-white/5 text-neutral-450 hover:text-white"
@@ -829,7 +829,7 @@ export default function App() {
                           onClick={() => {
                             setExpandedRoutineIndex(isExpanded ? null : workout.dayIndex);
                           }}
-                          className="flex-1 text-center bg-transparent hover:bg-white/5 text-neutral-350 hover:text-white font-bold text-xs uppercase px-4 py-3 border border-white/10 rounded-xl transition-all cursor-pointer select-none flex items-center justify-center gap-1.5"
+                          className="flex-1 text-center bg-transparent hover:bg-white/5 text-neutral-350 hover:text-white font-black text-xs sm:text-sm uppercase px-5 py-4 border border-white/10 rounded-2xl transition-all cursor-pointer select-none flex items-center justify-center gap-1.5 min-h-[48px] active:scale-95"
                         >
                           <span>{isExpanded ? "Close Drawer" : "Preview Moves"}</span>
                           {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5 rotate-90" />}
@@ -847,7 +847,7 @@ export default function App() {
                               setIsWorkoutMinimized(false);
                             }
                           }}
-                          className={`flex-1 ${buttonClass} text-white font-extrabold text-xs uppercase text-center px-4 py-3.5 rounded-xl transition-all shadow-md active:scale-95 select-none cursor-pointer tracking-wider`}
+                          className={`flex-1 ${buttonClass} text-white font-black text-xs sm:text-sm uppercase text-center px-5 py-4 rounded-2xl transition-all shadow-md active:scale-95 select-none cursor-pointer tracking-wider min-h-[48px]`}
                         >
                           Start Session
                         </button>
@@ -990,7 +990,7 @@ export default function App() {
             initial={{ y: 80, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 80, opacity: 0 }}
-            className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 liquid-glass border border-pink-500/20 rounded-[2rem] p-4 shadow-2xl z-50 flex items-center justify-between backdrop-blur-xl"
+            className="fixed bottom-20 left-4 right-4 md:bottom-4 md:left-auto md:right-4 md:w-96 liquid-glass border border-pink-500/20 rounded-[2rem] p-4 shadow-2xl z-50 flex items-center justify-between backdrop-blur-xl"
           >
             <div className="flex items-center gap-3">
               <div className="bg-pink-500/10 p-2.5 border border-pink-500/20 rounded-xl text-pink-500 animate-pulse glow-pink">
@@ -1111,6 +1111,44 @@ git push -u origin main`}
           </div>
         )}
       </AnimatePresence>
+
+      {/* Fixed Bottom Navigation Bar for Mobile App feel */}
+      <div className="fixed bottom-0 left-0 right-0 z-45 bg-[#050508]/90 backdrop-blur-2xl border-t border-white/5 py-2.5 pb-safe flex md:hidden justify-around items-center shadow-2xl">
+        <button
+          onClick={() => setActiveTab("splits")}
+          className={`flex flex-col items-center justify-center gap-1.5 py-1.5 flex-1 min-h-[48px] cursor-pointer select-none active:scale-95 transition-all ${
+            activeTab === "splits" ? "text-pink-500 font-extrabold" : "text-neutral-450 hover:text-white"
+          }`}
+        >
+          <Compass className={`w-5 h-5 ${activeTab === "splits" ? "scale-110 text-pink-500 glow-pink" : ""}`} />
+          <span className="text-[9px] uppercase tracking-widest font-mono">Routines</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("history")}
+          className={`flex flex-col items-center justify-center gap-1.5 py-1.5 flex-1 min-h-[48px] cursor-pointer select-none active:scale-95 transition-all ${
+            activeTab === "history" ? "text-pink-500 font-extrabold" : "text-neutral-450 hover:text-white"
+          }`}
+        >
+          <div className="relative">
+            <History className={`w-5 h-5 ${activeTab === "history" ? "scale-110 text-pink-500 glow-pink" : ""}`} />
+            {workoutLogs.length > 0 && (
+              <span className="absolute -top-1.5 -right-2 bg-pink-500 text-black font-black font-mono text-[7px] px-1 rounded-full border border-neutral-950">
+                {workoutLogs.length}
+              </span>
+            )}
+          </div>
+          <span className="text-[9px] uppercase tracking-widest font-mono">Logbook</span>
+        </button>
+
+        <button
+          onClick={() => setIsEditingProfile(true)}
+          className="flex flex-col items-center justify-center gap-1.5 py-1.5 flex-1 min-h-[48px] cursor-pointer select-none active:scale-95 transition-all text-neutral-450 hover:text-white"
+        >
+          <User className="w-5 h-5" />
+          <span className="text-[9px] uppercase tracking-widest font-mono">Profile</span>
+        </button>
+      </div>
     </div>
   );
 }

@@ -707,11 +707,11 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
       </main>
 
       {/* Persistent global footer workout-HUD buttons */}
-      <footer className="fixed bottom-0 left-0 right-0 z-40 bg-neutral-950/85 border-t border-white/5 px-4 py-4 flex items-center justify-center shadow-2xl backdrop-blur-xl">
+      <footer className="fixed bottom-0 left-0 right-0 z-40 bg-neutral-950/85 border-t border-white/5 px-4 py-4 flex items-center justify-center shadow-2xl backdrop-blur-xl pb-safe">
         <div className="max-w-4xl w-full flex items-center justify-between gap-3 sm:gap-4">
           <button
             onClick={onCancel}
-            className="px-4 py-3 bg-white/3 hover:bg-white/5 border border-white/5 text-neutral-400 hover:text-white font-black text-[10px] sm:text-xs tracking-wider uppercase rounded-xl transition-all cursor-pointer"
+            className="px-5 py-4 bg-white/3 hover:bg-white/5 border border-white/5 text-neutral-400 hover:text-white font-black text-xs md:text-sm tracking-wider uppercase rounded-xl transition-all cursor-pointer min-h-[48px]"
           >
             Quit Session
           </button>
@@ -719,7 +719,7 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
           {onMinimize && (
             <button
               onClick={onMinimize}
-              className="flex-1 px-4 py-3 bg-white/3 hover:bg-white/5 border border-white/5 text-neutral-200 hover:text-white font-black text-[10px] sm:text-xs tracking-wider uppercase rounded-xl transition-all text-center cursor-pointer"
+              className="flex-1 px-5 py-4 bg-white/3 hover:bg-white/5 border border-white/5 text-neutral-200 hover:text-white font-black text-xs md:text-sm tracking-wider uppercase rounded-xl transition-all text-center cursor-pointer min-h-[48px]"
             >
               Minimize Workout
             </button>
@@ -727,7 +727,7 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
 
           <button
             onClick={handleCompleteWorkout}
-            className="btn-liquid-pink flex-1 max-w-sm text-white font-black text-[10px] sm:text-xs tracking-widest uppercase py-3.5 rounded-xl transition-all shadow-xl flex items-center justify-center gap-2 select-none active:scale-98 cursor-pointer"
+            className="btn-liquid-pink flex-1 max-w-sm text-white font-black text-xs md:text-sm tracking-widest uppercase py-4.5 rounded-xl transition-all shadow-xl flex items-center justify-center gap-2 select-none active:scale-98 cursor-pointer min-h-[48px]"
           >
             <Award className="w-4 h-4" />
             <span>Finish Lift</span>
@@ -831,7 +831,7 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
                     setRestSecondsLeft((prev) => (prev !== null ? prev + 30 : 30));
                     setRestTotal((prev) => prev + 30);
                   }}
-                  className="flex-1 bg-white/5 border border-white/10 px-5 py-3.5 rounded-2xl hover:bg-white/10 active:scale-95 transition-all text-xs font-mono font-black uppercase text-neutral-350 hover:text-white flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="flex-1 bg-white/5 border border-white/10 px-6 py-4.5 rounded-2xl hover:bg-white/10 active:scale-95 transition-all text-sm font-mono font-black uppercase text-neutral-350 hover:text-white flex items-center justify-center gap-1.5 cursor-pointer min-h-[48px]"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>+30s Rest</span>
@@ -841,7 +841,7 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
                     setRestSecondsLeft(null);
                     setIsRestCompleted(false);
                   }}
-                  className="flex-1 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-5 py-3.5 rounded-2xl font-mono font-black text-xs uppercase shadow-lg shadow-pink-500/20 active:scale-95 transition-all cursor-pointer"
+                  className="flex-1 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-6 py-4.5 rounded-2xl font-mono font-black text-sm uppercase shadow-lg shadow-pink-500/20 active:scale-95 transition-all cursor-pointer min-h-[48px]"
                 >
                   Skip Rest
                 </button>
@@ -1157,17 +1157,17 @@ function ActiveExerciseCard({
                   <button
                     disabled={set.completed}
                     onClick={() => handleUpdateWeight(ex.id, set.setIndex, -5)}
-                    className="w-7 h-7 flex items-center justify-center bg-white/3 hover:bg-white/7 disabled:opacity-10 text-white text-xs font-black rounded-full border border-white/5 transition-all cursor-pointer active:scale-90"
+                    className="w-11 h-11 md:w-9 md:h-9 flex items-center justify-center bg-white/3 hover:bg-white/7 disabled:opacity-10 text-white text-sm md:text-xs font-black rounded-full border border-white/5 transition-all cursor-pointer active:scale-90"
                   >
                     -
                   </button>
-                  <span className="font-mono text-xs font-black w-8 text-center text-white">
+                  <span className="font-mono text-sm md:text-xs font-black w-9 text-center text-white">
                     {set.weight}
                   </span>
                   <button
                     disabled={set.completed}
                     onClick={() => handleUpdateWeight(ex.id, set.setIndex, 5)}
-                    className="w-7 h-7 flex items-center justify-center bg-white/3 hover:bg-white/7 disabled:opacity-10 text-white text-xs font-black rounded-full border border-white/5 transition-all cursor-pointer active:scale-90"
+                    className="w-11 h-11 md:w-9 md:h-9 flex items-center justify-center bg-white/3 hover:bg-white/7 disabled:opacity-10 text-white text-sm md:text-xs font-black rounded-full border border-white/5 transition-all cursor-pointer active:scale-90"
                   >
                     +
                   </button>
@@ -1178,17 +1178,17 @@ function ActiveExerciseCard({
                   <button
                     disabled={set.completed}
                     onClick={() => handleUpdateRep(ex.id, set.setIndex, -1)}
-                    className="w-7 h-7 flex items-center justify-center bg-white/3 hover:bg-white/7 disabled:opacity-10 text-white text-xs font-black rounded-full border border-white/5 transition-all cursor-pointer active:scale-90"
+                    className="w-11 h-11 md:w-9 md:h-9 flex items-center justify-center bg-white/3 hover:bg-white/7 disabled:opacity-10 text-white text-sm md:text-xs font-black rounded-full border border-white/5 transition-all cursor-pointer active:scale-90"
                   >
                     -
                   </button>
-                  <span className="font-mono text-xs font-black w-7 text-center text-white">
+                  <span className="font-mono text-sm md:text-xs font-black w-8 text-center text-white">
                     {set.reps}
                   </span>
                   <button
                     disabled={set.completed}
                     onClick={() => handleUpdateRep(ex.id, set.setIndex, 1)}
-                    className="w-7 h-7 flex items-center justify-center bg-white/3 hover:bg-white/7 disabled:opacity-10 text-white text-xs font-black rounded-full border border-white/5 transition-all cursor-pointer active:scale-90"
+                    className="w-11 h-11 md:w-9 md:h-9 flex items-center justify-center bg-white/3 hover:bg-white/7 disabled:opacity-10 text-white text-sm md:text-xs font-black rounded-full border border-white/5 transition-all cursor-pointer active:scale-90"
                   >
                     +
                   </button>
@@ -1198,13 +1198,13 @@ function ActiveExerciseCard({
                 <div className="col-span-2 flex justify-end">
                   <button
                     onClick={() => handleToggleComplete(ex.id, set.setIndex)}
-                    className={`w-7 h-7 flex items-center justify-center rounded-full border transition-all cursor-pointer ${
+                    className={`w-11 h-11 md:w-9 md:h-9 flex items-center justify-center rounded-full border transition-all cursor-pointer ${
                       set.completed
                         ? "bg-emerald-500 border-emerald-500 text-neutral-950 shadow-[0_0_12px_rgba(16,185,129,0.4)]"
                         : "border-white/10 hover:border-pink-500/50 hover:bg-pink-500/10 text-transparent"
                     }`}
                   >
-                    <Check className="w-3.5 h-3.5" strokeWidth={3.5} />
+                    <Check className="w-5 h-5 md:w-4 md:h-4" strokeWidth={3.5} />
                   </button>
                 </div>
               </div>
