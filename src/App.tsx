@@ -59,6 +59,18 @@ export default function App() {
   const [signUpNameInput, setSignUpNameInput] = useState("");
   const [authError, setAuthError] = useState("");
 
+  // Helper: Checks if a training block has been completed this week
+  const isDayCompletedThisWeek = (dayIndex: number) => {
+    // Look at logs completed within the last 7 days matching dayIndex
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    return workoutLogs.some((log) => {
+      const compDate = new Date(log.completedAt);
+      return log.dayIndex === dayIndex && compDate.getTime() >= oneWeekAgo.getTime();
+    });
+  };
+
   // Circular progress data calculations for Liquid UI
   const completedThisWeekCount = GYM_TIGER_SPLIT.filter((day) => isDayCompletedThisWeek(day.dayIndex)).length;
   const completionPercentage = GYM_TIGER_SPLIT.length > 0 
@@ -397,18 +409,6 @@ export default function App() {
       localStorage.setItem("gym_tiger_user", JSON.stringify(nextUser));
       localStorage.setItem("gym_tiger_logs", JSON.stringify(finalLogsList));
     }
-  };
-
-  // Helper: Checks if a training block has been completed this week
-  const isDayCompletedThisWeek = (dayIndex: number) => {
-    // Look at logs completed within the last 7 days matching dayIndex
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-    return workoutLogs.some((log) => {
-      const compDate = new Date(log.completedAt);
-      return log.dayIndex === dayIndex && compDate.getTime() >= oneWeekAgo.getTime();
-    });
   };
 
   if (loading) {
