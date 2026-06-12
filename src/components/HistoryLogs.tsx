@@ -6,9 +6,10 @@ import { motion, AnimatePresence } from "motion/react";
 interface HistoryLogsProps {
   logs: WorkoutLog[];
   onDeleteLog: (logId: string) => void;
+  isDarkMode?: boolean;
 }
 
-export default function HistoryLogs({ logs, onDeleteLog }: HistoryLogsProps) {
+export default function HistoryLogs({ logs, onDeleteLog, isDarkMode = true }: HistoryLogsProps) {
   const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
 
   const toggleExpand = (logId: string) => {
@@ -48,12 +49,23 @@ export default function HistoryLogs({ logs, onDeleteLog }: HistoryLogsProps) {
 
   if (logs.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 bg-white/2 border border-dashed border-white/10 rounded-[2.5rem] text-center" id="empty-history-container">
-        <div className="bg-white/3 p-5 rounded-full border border-white/5 text-neutral-550 mb-4 shadow-xl">
+      <div 
+        className={`flex flex-col items-center justify-center p-12 border border-dashed rounded-[2.5rem] text-center transition-colors duration-300 ${
+          isDarkMode ? "bg-white/2 border-white/10 text-neutral-450" : "bg-black/2 border-black/10 text-neutral-600"
+        }`} 
+        id="empty-history-container"
+      >
+        <div className={`p-5 rounded-full border shadow-xl ${
+          isDarkMode ? "bg-white/3 border-white/5 text-neutral-550" : "bg-black/3 border-black/10 text-neutral-500"
+        }`}>
           <Dumbbell className="w-8 h-8" />
         </div>
-        <h3 className="text-sm font-black text-white uppercase tracking-wider">No Training History Found</h3>
-        <p className="text-[11px] text-neutral-400 max-w-xs mt-1.5 leading-relaxed">
+        <h3 className={`text-sm font-black uppercase tracking-wider ${
+          isDarkMode ? "text-white" : "text-neutral-900"
+        }`}>No Training History Found</h3>
+        <p className={`text-[11px] max-w-xs mt-1.5 leading-relaxed ${
+          isDarkMode ? "text-neutral-400" : "text-neutral-550"
+        }`}>
           Unlock your true strength. Select Day 1 to Day 6 from the splits board, open details, and complete your first session!
         </p>
       </div>
@@ -107,41 +119,69 @@ export default function HistoryLogs({ logs, onDeleteLog }: HistoryLogsProps) {
     <div className="flex flex-col gap-4" id="history-logs-board">
       {/* Visual Header Grid Panel */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <div className="liquid-glass rounded-[2rem] p-4.5 border border-white/5 flex flex-col justify-between min-h-[90px]">
-          <span className="text-[9px] font-mono text-neutral-450 uppercase tracking-widest block font-black">Training Hits</span>
-          <span className="text-xl sm:text-2xl font-black tracking-tight mt-1 inline-flex items-center gap-2 text-white">
+        <div className={`rounded-[2rem] p-4.5 border flex flex-col justify-between min-h-[90px] transition-colors duration-300 ${
+          isDarkMode ? "liquid-glass border-white/5" : "light-glass border-black/5"
+        }`}>
+          <span className={`text-[9px] font-mono uppercase tracking-widest block font-black ${
+            isDarkMode ? "text-neutral-450" : "text-neutral-500"
+          }`}>Training Hits</span>
+          <span className={`text-xl sm:text-2xl font-black tracking-tight mt-1 inline-flex items-center gap-2 ${
+            isDarkMode ? "text-white" : "text-neutral-900"
+          }`}>
             {logs.length}
-            <Dumbbell className="w-4 h-4 text-pink-500 glow-pink" />
+            <Dumbbell className={`w-4 h-4 text-pink-500 ${isDarkMode ? "glow-pink" : ""}`} />
           </span>
         </div>
 
-        <div className="liquid-glass rounded-[2rem] p-4.5 border border-white/5 flex flex-col justify-between min-h-[90px]">
-          <span className="text-[9px] font-mono text-neutral-450 uppercase tracking-widest block font-black">Total Work Sets</span>
-          <span className="text-xl sm:text-2xl font-black tracking-tight mt-1 inline-flex items-center gap-2 text-white">
+        <div className={`rounded-[2rem] p-4.5 border flex flex-col justify-between min-h-[90px] transition-colors duration-300 ${
+          isDarkMode ? "liquid-glass border-white/5" : "light-glass border-black/5"
+        }`}>
+          <span className={`text-[9px] font-mono uppercase tracking-widest block font-black ${
+            isDarkMode ? "text-neutral-455" : "text-neutral-500"
+          }`}>Total Work Sets</span>
+          <span className={`text-xl sm:text-2xl font-black tracking-tight mt-1 inline-flex items-center gap-2 ${
+            isDarkMode ? "text-white" : "text-neutral-900"
+          }`}>
             {logs.reduce((sum, current) => sum + calculateCompletedSetsCount(current), 0)}
-            <Award className="w-4 h-4 text-pink-500 glow-pink" />
+            <Award className={`w-4 h-4 text-pink-500 ${isDarkMode ? "glow-pink" : ""}`} />
           </span>
         </div>
 
-        <div className="liquid-glass rounded-[2rem] p-4.5 border border-white/5 flex flex-col justify-between min-h-[90px] col-span-2 sm:col-span-1">
-          <span className="text-[9px] font-mono text-neutral-450 uppercase tracking-widest block font-black">Est. Weight Volume</span>
-          <span className="text-xl sm:text-2xl font-black tracking-tight mt-1 inline-flex items-center gap-1 text-white">
-            {logs.reduce((sum, current) => sum + calculateVolume(current), 0).toLocaleString()} <span className="text-xs text-neutral-400 font-bold uppercase tracking-wider pl-0.5">lbs</span>
-            <TrendingUp className="w-4 h-4 text-pink-500 glow-pink" />
+        <div className={`rounded-[2rem] p-4.5 border flex flex-col justify-between min-h-[90px] col-span-2 sm:col-span-1 transition-colors duration-300 ${
+          isDarkMode ? "liquid-glass border-white/5" : "light-glass border-black/5"
+        }`}>
+          <span className={`text-[9px] font-mono uppercase tracking-widest block font-black ${
+            isDarkMode ? "text-neutral-455" : "text-neutral-500"
+          }`}>Est. Weight Volume</span>
+          <span className={`text-xl sm:text-2xl font-black tracking-tight mt-1 inline-flex items-center gap-1 ${
+            isDarkMode ? "text-white" : "text-neutral-900"
+          }`}>
+            {logs.reduce((sum, current) => sum + calculateVolume(current), 0).toLocaleString()} <span className={`text-xs font-bold uppercase tracking-wider pl-0.5 ${
+              isDarkMode ? "text-neutral-400" : "text-neutral-500"
+            }`}>lbs</span>
+            <TrendingUp className={`w-4 h-4 text-pink-500 ${isDarkMode ? "glow-pink" : ""}`} />
           </span>
         </div>
       </div>
 
       {/* SVG Smooth Wave Trend Chart */}
       {chartLogs.length > 0 && (
-        <div className="liquid-glass rounded-[2.5rem] p-5 border border-white/5 flex flex-col gap-3 shadow-2xl relative overflow-hidden">
+        <div className={`rounded-[2.5rem] p-5 border flex flex-col gap-3 shadow-2xl relative overflow-hidden transition-colors duration-300 ${
+          isDarkMode ? "liquid-glass border-white/5" : "light-glass border-black/5"
+        }`}>
           <div className="absolute -left-10 -bottom-10 w-32 h-32 rounded-full bg-pink-500/5 blur-3xl pointer-events-none" />
           <div className="flex justify-between items-center z-10">
             <div>
-              <span className="text-[9px] text-pink-500 font-mono font-black uppercase tracking-widest glow-pink">Volume Metrics</span>
-              <h4 className="text-xs font-black text-white uppercase mt-0.5 tracking-tight">Session Weight Curve</h4>
+              <span className={`text-[9px] text-pink-500 font-mono font-black uppercase tracking-widest ${isDarkMode ? "glow-pink" : ""}`}>Volume Metrics</span>
+              <h4 className={`text-xs font-black uppercase mt-0.5 tracking-tight ${
+                isDarkMode ? "text-white" : "text-neutral-900"
+              }`}>Session Weight Curve</h4>
             </div>
-            <span className="text-[9px] font-mono text-neutral-400 uppercase font-black bg-white/3 border border-white/5 px-2 py-0.5 rounded-full">
+            <span className={`text-[9px] font-mono uppercase font-black px-2 py-0.5 rounded-full border ${
+              isDarkMode 
+                ? "bg-white/3 border-white/5 text-neutral-400" 
+                : "bg-black/3 border-black/10 text-neutral-600"
+            }`}>
               Lbs Lifted/7 Day Window
             </span>
           </div>
@@ -162,9 +202,9 @@ export default function HistoryLogs({ logs, onDeleteLog }: HistoryLogsProps) {
               </defs>
 
               {/* Grid Lines */}
-              <line x1={paddingX} y1={paddingY} x2={svgWidth - paddingX} y2={paddingY} stroke="rgba(255,255,255,0.03)" strokeDasharray="3 3" />
-              <line x1={paddingX} y1={svgHeight / 2} x2={svgWidth - paddingX} y2={svgHeight / 2} stroke="rgba(255,255,255,0.03)" strokeDasharray="3 3" />
-              <line x1={paddingX} y1={svgHeight - paddingY} x2={svgWidth - paddingX} y2={svgHeight - paddingY} stroke="rgba(255,255,255,0.05)" />
+              <line x1={paddingX} y1={paddingY} x2={svgWidth - paddingX} y2={paddingY} stroke={isDarkMode ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)"} strokeDasharray="3 3" />
+              <line x1={paddingX} y1={svgHeight / 2} x2={svgWidth - paddingX} y2={svgHeight / 2} stroke={isDarkMode ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)"} strokeDasharray="3 3" />
+              <line x1={paddingX} y1={svgHeight - paddingY} x2={svgWidth - paddingX} y2={svgHeight - paddingY} stroke={isDarkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"} />
 
               {points.length > 1 && (
                 <>
@@ -181,14 +221,16 @@ export default function HistoryLogs({ logs, onDeleteLog }: HistoryLogsProps) {
                   {/* Outer Pulsing Hover Aura */}
                   <circle cx={p.x} cy={p.y} r="8" fill="rgba(236, 72, 153, 0.15)" className="opacity-0 group-hover/dot:opacity-100 transition-opacity duration-200" />
                   {/* Solid Point Dot */}
-                  <circle cx={p.x} cy={p.y} r="4.5" fill="#ec4899" stroke="#ffffff" strokeWidth="1.5" className="transition-all duration-300 group-hover/dot:scale-125" />
+                  <circle cx={p.x} cy={p.y} r="4.5" fill="#ec4899" stroke={isDarkMode ? "#0a0a0a" : "#ffffff"} strokeWidth="1.5" className="transition-all duration-300 group-hover/dot:scale-125" />
                   
                   {/* Value label on top */}
                   <text
                     x={p.x}
                     y={p.y - 12}
                     textAnchor="middle"
-                    className="font-mono text-[8px] font-black fill-pink-400 select-none pointer-events-none tracking-tighter"
+                    className={`font-mono text-[8px] font-black select-none pointer-events-none tracking-tighter ${
+                      isDarkMode ? "fill-pink-400" : "fill-pink-600"
+                    }`}
                   >
                     {volumes[i] > 0 ? `${(volumes[i] / 1000).toFixed(1)}k` : "0"}
                   </text>
@@ -219,23 +261,35 @@ export default function HistoryLogs({ logs, onDeleteLog }: HistoryLogsProps) {
           return (
             <div
               key={log.logId}
-              className="liquid-glass rounded-[2rem] overflow-hidden shadow-lg transition-all border border-white/5"
+              className={`rounded-[2rem] overflow-hidden shadow-lg border transition-colors duration-300 ${
+                isDarkMode ? "liquid-glass border-white/5" : "light-glass border-black/5"
+              }`}
             >
               {/* Card Header clickable row */}
               <div
                 onClick={() => toggleExpand(log.logId)}
-                className="p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/2 select-none transition-colors"
+                className={`p-4.5 flex items-center justify-between cursor-pointer select-none transition-colors ${
+                  isDarkMode ? "hover:bg-white/2" : "hover:bg-black/2"
+                }`}
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="bg-pink-500/10 text-pink-500 p-2.5 rounded-xl border border-pink-500/20 shadow-[0_0_12px_rgba(236,72,153,0.1)] shrink-0">
+                  <div className={`bg-pink-500/10 text-pink-500 p-2.5 rounded-xl border border-pink-500/20 shrink-0 ${
+                    isDarkMode ? "shadow-[0_0_12px_rgba(236,72,153,0.1)]" : "shadow-none"
+                  }`}>
                     <Calendar className="w-4 h-4" />
                   </div>
                   <div>
-                    <span className="text-[9px] font-mono font-black leading-none text-pink-500 uppercase tracking-widest block glow-pink">
+                    <span className={`text-[9px] font-mono font-black leading-none text-pink-500 uppercase tracking-widest block ${
+                      isDarkMode ? "glow-pink" : ""
+                    }`}>
                       {formatDate(log.completedAt)}
                     </span>
-                    <h4 className="text-sm font-extrabold text-white mt-1.5 uppercase tracking-tight">{log.workoutName}</h4>
-                    <div className="flex items-center gap-3 mt-1.5 text-[10px] text-neutral-450 font-mono font-bold">
+                    <h4 className={`text-sm font-extrabold mt-1.5 uppercase tracking-tight ${
+                      isDarkMode ? "text-white" : "text-neutral-900"
+                    }`}>{log.workoutName}</h4>
+                    <div className={`flex items-center gap-3 mt-1.5 text-[10px] font-mono font-bold ${
+                      isDarkMode ? "text-neutral-450" : "text-neutral-600"
+                    }`}>
                       <span className="flex items-center gap-1">
                         <Clock className="w-3.5 h-3.5 text-neutral-550" />
                         {formatDuration(log.duration)}
@@ -247,7 +301,9 @@ export default function HistoryLogs({ logs, onDeleteLog }: HistoryLogsProps) {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="hidden sm:inline-block font-mono text-[10px] font-black text-pink-400 bg-pink-500/10 border border-pink-500/20 px-2.5 py-1 rounded-full uppercase tracking-wider glow-pink">
+                  <span className={`hidden sm:inline-block font-mono text-[10px] font-black text-pink-500 bg-pink-500/10 border border-pink-500/20 px-2.5 py-1 rounded-full uppercase tracking-wider ${
+                    isDarkMode ? "glow-pink" : ""
+                  }`}>
                     {totalVol > 0 ? `${totalVol.toLocaleString()} lbs` : "POSTURE DAY"}
                   </span>
                   <button
@@ -257,12 +313,16 @@ export default function HistoryLogs({ logs, onDeleteLog }: HistoryLogsProps) {
                         onDeleteLog(log.logId);
                       }
                     }}
-                    className="p-2.5 text-neutral-500 hover:text-red-500 bg-white/3 hover:bg-red-550/10 border border-white/5 hover:border-red-500/20 rounded-xl transition-all cursor-pointer active:scale-95"
+                    className={`p-2.5 rounded-xl transition-all cursor-pointer active:scale-95 border ${
+                      isDarkMode
+                        ? "text-neutral-500 hover:text-red-400 bg-white/3 border-white/5 hover:bg-red-500/10 hover:border-red-500/20"
+                        : "text-neutral-550 hover:text-red-600 bg-black/3 border-black/5 hover:bg-red-500/5 hover:border-red-500/20"
+                    }`}
                     title="Delete Record"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
-                  <div className="text-neutral-450 p-1 shrink-0">
+                  <div className={`p-1 shrink-0 ${isDarkMode ? "text-neutral-450" : "text-neutral-600"}`}>
                     {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   </div>
                 </div>
@@ -276,9 +336,13 @@ export default function HistoryLogs({ logs, onDeleteLog }: HistoryLogsProps) {
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.25 }}
-                    className="border-t border-white/5 px-5 py-5 bg-black/30"
+                    className={`px-5 py-5 border-t ${
+                      isDarkMode ? "border-white/5 bg-black/30" : "border-black/5 bg-black/[0.01]"
+                    }`}
                   >
-                    <h5 className="text-[9px] font-mono font-black text-neutral-450 uppercase tracking-widest mb-3.5">
+                    <h5 className={`text-[9px] font-mono font-black uppercase tracking-widest mb-3.5 ${
+                      isDarkMode ? "text-neutral-450" : "text-neutral-500"
+                    }`}>
                       EXERCISE BREAKDOWN
                     </h5>
                     <div className="flex flex-col gap-3.5">
@@ -287,18 +351,28 @@ export default function HistoryLogs({ logs, onDeleteLog }: HistoryLogsProps) {
                         if (verifiedSets.length === 0) return null;
 
                         return (
-                          <div key={ex.exerciseId} className="flex flex-col gap-1.5 border-b border-white/5 pb-3.5 last:border-0 last:pb-0">
+                          <div key={ex.exerciseId} className={`flex flex-col gap-1.5 border-b pb-3.5 last:border-0 last:pb-0 ${
+                            isDarkMode ? "border-white/5" : "border-black/5"
+                          }`}>
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-extrabold text-white uppercase">{ex.name}</span>
-                              <span className="text-[9px] font-mono text-pink-400 bg-pink-500/10 border border-pink-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold glow-pink">{ex.category}</span>
+                              <span className={`text-xs font-extrabold uppercase ${
+                                isDarkMode ? "text-white" : "text-neutral-850"
+                              }`}>{ex.name}</span>
+                              <span className={`text-[9px] font-mono text-pink-500 bg-pink-500/10 border border-pink-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold ${
+                                isDarkMode ? "glow-pink" : ""
+                              }`}>{ex.category}</span>
                             </div>
                             <div className="flex flex-wrap gap-1.5 mt-2">
                               {verifiedSets.map((s, sIdx) => (
                                 <span
                                   key={sIdx}
-                                  className="text-[10px] font-mono text-neutral-300 bg-white/3 border border-white/5 px-2.5 py-1 rounded-lg font-bold"
+                                  className={`text-[10px] font-mono px-2.5 py-1 rounded-lg font-bold border ${
+                                    isDarkMode
+                                      ? "text-neutral-300 bg-white/3 border-white/5"
+                                      : "text-neutral-700 bg-black/3 border-black/5"
+                                  }`}
                                 >
-                                  Set {s.setIndex}: <span className="text-pink-400 font-black glow-pink">{s.weight} lbs</span> x {s.reps}
+                                  Set {s.setIndex}: <span className={`text-pink-500 font-black ${isDarkMode ? "glow-pink" : ""}`}>{s.weight} lbs</span> x {s.reps}
                                 </span>
                               ))}
                             </div>

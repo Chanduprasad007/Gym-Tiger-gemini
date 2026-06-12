@@ -13,9 +13,10 @@ interface ActiveWorkoutProps {
   onCancel: () => void;
   onViewDetails: (exercise: Exercise) => void;
   onMinimize?: () => void;
+  isDarkMode?: boolean;
 }
 
-export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinish, onCancel, onViewDetails, onMinimize }: ActiveWorkoutProps) {
+export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinish, onCancel, onViewDetails, onMinimize, isDarkMode = true }: ActiveWorkoutProps) {
   // Timer State
   const [seconds, setSeconds] = useState(0);
   const [isActive, setIsActive] = useState(true);
@@ -344,65 +345,88 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
   const lowBackProg = getMuscleGroupProgress("lower_back");
   const trapsProg = getMuscleGroupProgress("traps");
 
+  const inactiveFill = isDarkMode ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)";
+  const inactiveStroke = isDarkMode ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)";
+
   // Determine if active exercise in Focus Mode is completed
   const activeEx = workoutExercises[activeExIndex];
   const activeTrackingEx = activeExercises.find((ae) => ae.exerciseId === activeEx?.id);
   const isActiveExDone = activeTrackingEx?.sets.every((s) => s.completed) ?? false;
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white flex flex-col font-sans relative overflow-x-hidden" id="active-workout-console">
+    <div className={`min-h-screen flex flex-col font-sans relative overflow-x-hidden transition-colors duration-350 ${
+      isDarkMode ? "bg-[#050508] text-white" : "bg-neutral-50 text-neutral-900"
+    }`} id="active-workout-console">
       {/* Background Animated Blobs */}
-      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[35rem] h-[35rem] rounded-full bg-pink-500/10 blur-[120px] pointer-events-none animate-blob-1" />
-      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[40rem] h-[40rem] rounded-full bg-lime-500/10 blur-[150px] pointer-events-none animate-blob-2" />
+      <div className={`absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[35rem] h-[35rem] rounded-full blur-[120px] pointer-events-none animate-blob-1 ${
+        isDarkMode ? "bg-pink-500/10" : "bg-pink-500/4"
+      }`} />
+      <div className={`absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[40rem] h-[40rem] rounded-full blur-[150px] pointer-events-none animate-blob-2 ${
+        isDarkMode ? "bg-lime-500/10" : "bg-lime-500/4"
+      }`} />
 
       {/* Header section with brand-new premium HUD styling */}
-      <header className="sticky top-0 z-45 liquid-glass border-b border-white/5 px-4 py-3 flex items-center justify-between shadow-xl rounded-b-[2rem]">
+      <header className={`sticky top-0 z-45 border-b px-4 py-3 flex items-center justify-between shadow-xl rounded-b-[2rem] transition-colors duration-300 ${
+        isDarkMode ? "liquid-glass border-white/5" : "light-glass border-black/5"
+      }`}>
         <div className="flex items-center gap-2.5">
           {onMinimize && (
             <button
               onClick={onMinimize}
-              className="mr-1 p-2.5 bg-white/3 border border-white/5 hover:bg-white/5 rounded-xl text-neutral-400 hover:text-white transition-all cursor-pointer"
+              className={`mr-1 p-2.5 border rounded-xl transition-all cursor-pointer ${
+                isDarkMode 
+                  ? "bg-white/3 border-white/5 text-neutral-400 hover:bg-white/5 hover:text-white" 
+                  : "bg-black/3 border-black/10 text-neutral-600 hover:bg-black/5 hover:text-neutral-900"
+              }`}
               title="Minimize & Return to Home Dashboard"
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
           )}
-          <div className="bg-pink-500/15 border border-pink-500/25 text-pink-500 p-2 rounded-2xl hidden sm:block shadow-[0_0_15px_rgba(236,72,153,0.15)]">
-            <Flame className="w-5 h-5 glow-pink animate-pulse" />
+          <div className={`bg-pink-500/15 border border-pink-500/25 text-pink-500 p-2 rounded-2xl hidden sm:block ${isDarkMode ? "shadow-[0_0_15px_rgba(236,72,153,0.15)]" : ""}`}>
+            <Flame className={`w-5 h-5 animate-pulse ${isDarkMode ? "glow-pink" : ""}`} />
           </div>
           <div>
-            <span className="text-[10px] font-mono font-black tracking-widest text-pink-500 uppercase glow-pink">
+            <span className={`text-[10px] font-mono font-black tracking-widest text-pink-500 uppercase ${isDarkMode ? "glow-pink" : ""}`}>
               {dayWorkout.dayName} • {dayWorkout.focus.join(", ")}
             </span>
-            <h1 className="text-sm sm:text-base font-extrabold text-white tracking-tight leading-tight uppercase mt-0.5">{dayWorkout.title}</h1>
+            <h1 className={`text-sm sm:text-base font-extrabold tracking-tight leading-tight uppercase mt-0.5 ${
+              isDarkMode ? "text-white" : "text-neutral-900"
+            }`}>{dayWorkout.title}</h1>
           </div>
         </div>
 
         {/* Setup view toggle */}
         <div className="flex items-center gap-2">
-          <div className="flex bg-black/60 p-0.5 rounded-lg border border-white/5 select-none text-[9.5px] font-mono font-black">
+          <div className={`flex p-0.5 rounded-lg border select-none text-[9.5px] font-mono font-black ${
+            isDarkMode ? "bg-black/60 border-white/5" : "bg-black/10 border-black/5"
+          }`}>
             <button
               onClick={() => setIsFocusMode(true)}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded transition-all cursor-pointer ${isFocusMode ? "bg-pink-500 text-white shadow-[0_0_8px_rgba(236,72,153,0.3)]" : "text-neutral-450 hover:text-white"}`}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded transition-all cursor-pointer ${isFocusMode ? "bg-pink-500 text-white shadow-[0_0_8px_rgba(236,72,153,0.3)]" : isDarkMode ? "text-neutral-450 hover:text-white" : "text-neutral-650 hover:text-neutral-950"}`}
             >
               <Eye className="w-3 h-3" /> FOCUS
             </button>
             <button
               onClick={() => setIsFocusMode(false)}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded transition-all cursor-pointer ${!isFocusMode ? "bg-pink-500 text-white shadow-[0_0_8px_rgba(236,72,153,0.3)]" : "text-neutral-450 hover:text-white"}`}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded transition-all cursor-pointer ${!isFocusMode ? "bg-pink-500 text-white shadow-[0_0_8px_rgba(236,72,153,0.3)]" : isDarkMode ? "text-neutral-450 hover:text-white" : "text-neutral-650 hover:text-neutral-950"}`}
             >
               <LayoutGrid className="w-3 h-3" /> LIST
             </button>
           </div>
 
           {/* Timer stopwatch */}
-          <div className="flex items-center gap-2.5 bg-black/45 border border-white/5 px-3.5 py-1.5 rounded-full shadow-inner">
-            <span className="font-mono text-xs sm:text-sm font-black text-pink-500 glow-pink tracking-wider">
+          <div className={`flex items-center gap-2.5 px-3.5 py-1.5 rounded-full shadow-inner border ${
+            isDarkMode ? "bg-black/45 border-white/5" : "bg-black/5 border-black/5"
+          }`}>
+            <span className={`font-mono text-xs sm:text-sm font-black text-pink-500 tracking-wider ${isDarkMode ? "glow-pink" : ""}`}>
               {formatTime(seconds)}
             </span>
             <button
               onClick={() => setIsActive(!isActive)}
-              className="hover:text-pink-500 transition-colors text-neutral-450 cursor-pointer"
+              className={`transition-colors cursor-pointer ${
+                isDarkMode ? "text-neutral-455 hover:text-white" : "text-neutral-600 hover:text-neutral-900"
+              }`}
               title={isActive ? "Pause Timer" : "Resume Timer"}
             >
               {isActive ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
@@ -417,21 +441,27 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
         {/* Visual Dashboard Panel: Progress & SVG Muscle Map */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* Progress Card */}
-          <div className="md:col-span-2 liquid-glass rounded-[2rem] p-5 flex flex-col justify-between shadow-2xl relative overflow-hidden border border-white/5">
+          <div className={`md:col-span-2 rounded-[2rem] p-5 flex flex-col justify-between shadow-2xl relative overflow-hidden border transition-colors duration-300 ${
+            isDarkMode ? "liquid-glass border-white/5" : "light-glass border-black/5"
+          }`}>
             <div className="absolute -right-16 -top-16 w-40 h-40 rounded-full bg-pink-500/5 blur-3xl pointer-events-none" />
             
             <div className="flex flex-col gap-1 text-left">
-              <span className="text-[9px] text-pink-500 font-mono font-black uppercase tracking-widest glow-pink">Hypertrophy Progress</span>
-              <h2 className="text-base font-black text-white tracking-tight uppercase">Tearing Through Sets</h2>
-              <p className="text-[11px] text-neutral-400 mt-1">
-                Completed <span className="font-extrabold text-white">{completedSets}</span> of <span className="font-extrabold text-white">{totalSets}</span> sets. Squeeze each contraction!
+              <span className={`text-[9px] text-pink-500 font-mono font-black uppercase tracking-widest ${isDarkMode ? "glow-pink" : ""}`}>Hypertrophy Progress</span>
+              <h2 className={`text-base font-black tracking-tight uppercase ${
+                isDarkMode ? "text-white" : "text-neutral-900"
+              }`}>Tearing Through Sets</h2>
+              <p className={`text-[11px] mt-1 ${
+                isDarkMode ? "text-neutral-400" : "text-neutral-650"
+              }`}>
+                Completed <span className={`font-extrabold ${isDarkMode ? "text-white" : "text-neutral-950"}`}>{completedSets}</span> of <span className={`font-extrabold ${isDarkMode ? "text-white" : "text-neutral-955"}`}>{totalSets}</span> sets. Squeeze each contraction!
               </p>
             </div>
 
             <div className="flex items-center gap-4 mt-6">
               <div className="relative w-14 h-14 flex items-center justify-center shrink-0">
                 <svg width="56" height="56" className="transform -rotate-90">
-                  <circle stroke="rgba(255, 255, 255, 0.05)" fill="transparent" strokeWidth="6" r="22" cx="28" cy="28" />
+                  <circle stroke={isDarkMode ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)"} fill="transparent" strokeWidth="6" r="22" cx="28" cy="28" />
                   <motion.circle
                     stroke="url(#active-progress-gradient)"
                     fill="transparent"
@@ -452,28 +482,44 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
                     </linearGradient>
                   </defs>
                 </svg>
-                <span className="absolute text-[10px] font-black text-white font-mono">{progressPercent}%</span>
+                <span className={`absolute text-[10px] font-black font-mono ${isDarkMode ? "text-white" : "text-neutral-800"}`}>{progressPercent}%</span>
               </div>
 
               {/* Muscle completion overview pills */}
               <div className="flex flex-wrap gap-2 text-[9px] font-mono font-bold uppercase tracking-wider">
                 {latsProg.active && (
-                  <span className={`px-2.5 py-1 rounded-full border ${latsProg.percent === 100 ? "bg-pink-500/10 border-pink-500/30 text-pink-400 glow-pink" : "bg-white/3 border-white/5 text-neutral-400"}`}>
+                  <span className={`px-2.5 py-1 rounded-full border ${
+                    latsProg.percent === 100 
+                      ? "bg-pink-500/10 border-pink-500/30 text-pink-500 " + (isDarkMode ? "glow-pink" : "") 
+                      : (isDarkMode ? "bg-white/3 border-white/5 text-neutral-400" : "bg-black/3 border-black/5 text-neutral-500")
+                  }`}>
                     Lats: {Math.round(latsProg.percent)}%
                   </span>
                 )}
                 {shouldersProg.active && (
-                  <span className={`px-2.5 py-1 rounded-full border ${shouldersProg.percent === 100 ? "bg-pink-500/10 border-pink-500/30 text-pink-400 glow-pink" : "bg-white/3 border-white/5 text-neutral-400"}`}>
+                  <span className={`px-2.5 py-1 rounded-full border ${
+                    shouldersProg.percent === 100 
+                      ? "bg-pink-500/10 border-pink-500/30 text-pink-500 " + (isDarkMode ? "glow-pink" : "") 
+                      : (isDarkMode ? "bg-white/3 border-white/5 text-neutral-400" : "bg-black/3 border-black/5 text-neutral-500")
+                  }`}>
                     Delts: {Math.round(shouldersProg.percent)}%
                   </span>
                 )}
                 {lowBackProg.active && (
-                  <span className={`px-2.5 py-1 rounded-full border ${lowBackProg.percent === 100 ? "bg-pink-500/10 border-pink-500/30 text-pink-400 glow-pink" : "bg-white/3 border-white/5 text-neutral-400"}`}>
+                  <span className={`px-2.5 py-1 rounded-full border ${
+                    lowBackProg.percent === 100 
+                      ? "bg-pink-500/10 border-pink-500/30 text-pink-500 " + (isDarkMode ? "glow-pink" : "") 
+                      : (isDarkMode ? "bg-white/3 border-white/5 text-neutral-400" : "bg-black/3 border-black/5 text-neutral-500")
+                  }`}>
                     Lower Back: {Math.round(lowBackProg.percent)}%
                   </span>
                 )}
                 {trapsProg.active && (
-                  <span className={`px-2.5 py-1 rounded-full border ${trapsProg.percent === 100 ? "bg-pink-500/10 border-pink-500/30 text-pink-400 glow-pink" : "bg-white/3 border-white/5 text-neutral-400"}`}>
+                  <span className={`px-2.5 py-1 rounded-full border ${
+                    trapsProg.percent === 100 
+                      ? "bg-pink-500/10 border-pink-500/30 text-pink-500 " + (isDarkMode ? "glow-pink" : "") 
+                      : (isDarkMode ? "bg-white/3 border-white/5 text-neutral-400" : "bg-black/3 border-black/5 text-neutral-500")
+                  }`}>
                     Traps: {Math.round(trapsProg.percent)}%
                   </span>
                 )}
@@ -482,8 +528,12 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
           </div>
 
           {/* V-Taper SVG Muscle Map */}
-          <div className="liquid-glass rounded-[2rem] p-4 border border-white/5 flex flex-col items-center justify-between shadow-2xl relative">
-            <span className="text-[8.5px] text-neutral-450 font-mono font-black uppercase tracking-widest text-center">V-Taper Activation</span>
+          <div className={`rounded-[2rem] p-4 border flex flex-col items-center justify-between shadow-2xl relative transition-colors duration-300 ${
+            isDarkMode ? "liquid-glass border-white/5" : "light-glass border-black/5"
+          }`}>
+            <span className={`text-[8.5px] font-mono font-black uppercase tracking-widest text-center ${
+              isDarkMode ? "text-neutral-450" : "text-neutral-500"
+            }`}>V-Taper Activation</span>
             
             <div className="w-28 h-28 my-1 flex items-center justify-center">
               <svg viewBox="0 0 200 200" className="w-full h-full overflow-visible">
@@ -509,9 +559,9 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
                 {/* Traps */}
                 <path
                   d="M 100 30 L 125 60 L 100 80 L 75 60 Z"
-                  fill={trapsProg.active ? "url(#traps-grad)" : "rgba(255,255,255,0.03)"}
+                  fill={trapsProg.active ? "url(#traps-grad)" : inactiveFill}
                   fillOpacity={trapsProg.active ? 0.25 + (trapsProg.percent / 100) * 0.75 : 1}
-                  stroke={trapsProg.active ? (trapsProg.percent > 0 ? "#ec4899" : "rgba(236,72,153,0.35)") : "rgba(255,255,255,0.06)"}
+                  stroke={trapsProg.active ? (trapsProg.percent > 0 ? "#ec4899" : (isDarkMode ? "rgba(236,72,153,0.35)" : "rgba(236,72,153,0.55)")) : inactiveStroke}
                   strokeWidth="2"
                   className="transition-all duration-500"
                 />
@@ -519,9 +569,9 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
                 {/* Left Shoulder (Deltoid) */}
                 <path
                   d="M 70 58 C 50 65, 42 90, 60 110 C 65 105, 70 85, 74 65 Z"
-                  fill={shouldersProg.active ? "url(#delts-grad)" : "rgba(255,255,255,0.03)"}
+                  fill={shouldersProg.active ? "url(#delts-grad)" : inactiveFill}
                   fillOpacity={shouldersProg.active ? 0.25 + (shouldersProg.percent / 100) * 0.75 : 1}
-                  stroke={shouldersProg.active ? (shouldersProg.percent > 0 ? "#ec4899" : "rgba(236,72,153,0.35)") : "rgba(255,255,255,0.06)"}
+                  stroke={shouldersProg.active ? (shouldersProg.percent > 0 ? "#ec4899" : (isDarkMode ? "rgba(236,72,153,0.35)" : "rgba(236,72,153,0.55)")) : inactiveStroke}
                   strokeWidth="2"
                   className="transition-all duration-500"
                 />
@@ -529,9 +579,9 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
                 {/* Right Shoulder (Deltoid) */}
                 <path
                   d="M 130 58 C 150 65, 158 90, 140 110 C 135 105, 130 85, 126 65 Z"
-                  fill={shouldersProg.active ? "url(#delts-grad)" : "rgba(255,255,255,0.03)"}
+                  fill={shouldersProg.active ? "url(#delts-grad)" : inactiveFill}
                   fillOpacity={shouldersProg.active ? 0.25 + (shouldersProg.percent / 100) * 0.75 : 1}
-                  stroke={shouldersProg.active ? (shouldersProg.percent > 0 ? "#ec4899" : "rgba(236,72,153,0.35)") : "rgba(255,255,255,0.06)"}
+                  stroke={shouldersProg.active ? (shouldersProg.percent > 0 ? "#ec4899" : (isDarkMode ? "rgba(236,72,153,0.35)" : "rgba(236,72,153,0.55)")) : inactiveStroke}
                   strokeWidth="2"
                   className="transition-all duration-500"
                 />
@@ -539,9 +589,9 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
                 {/* Left Lat */}
                 <path
                   d="M 82 110 C 58 130, 50 170, 85 190 C 95 170, 95 130, 96 110 Z"
-                  fill={latsProg.active ? "url(#lats-grad)" : "rgba(255,255,255,0.03)"}
+                  fill={latsProg.active ? "url(#lats-grad)" : inactiveFill}
                   fillOpacity={latsProg.active ? 0.25 + (latsProg.percent / 100) * 0.75 : 1}
-                  stroke={latsProg.active ? (latsProg.percent > 0 ? "#84cc16" : "rgba(132,204,22,0.35)") : "rgba(255,255,255,0.06)"}
+                  stroke={latsProg.active ? (latsProg.percent > 0 ? "#84cc16" : (isDarkMode ? "rgba(132,204,22,0.35)" : "rgba(132,204,22,0.55)")) : inactiveStroke}
                   strokeWidth="2"
                   className="transition-all duration-500"
                 />
@@ -549,9 +599,9 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
                 {/* Right Lat */}
                 <path
                   d="M 118 110 C 142 130, 150 170, 115 190 C 105 170, 105 130, 104 110 Z"
-                  fill={latsProg.active ? "url(#lats-grad)" : "rgba(255,255,255,0.03)"}
+                  fill={latsProg.active ? "url(#lats-grad)" : inactiveFill}
                   fillOpacity={latsProg.active ? 0.25 + (latsProg.percent / 100) * 0.75 : 1}
-                  stroke={latsProg.active ? (latsProg.percent > 0 ? "#84cc16" : "rgba(132,204,22,0.35)") : "rgba(255,255,255,0.06)"}
+                  stroke={latsProg.active ? (latsProg.percent > 0 ? "#84cc16" : (isDarkMode ? "rgba(132,204,22,0.35)" : "rgba(132,204,22,0.55)")) : inactiveStroke}
                   strokeWidth="2"
                   className="transition-all duration-500"
                 />
@@ -559,9 +609,9 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
                 {/* Lower Back */}
                 <path
                   d="M 88 111 L 112 111 L 108 190 L 92 190 Z"
-                  fill={lowBackProg.active ? "url(#lowback-grad)" : "rgba(255,255,255,0.03)"}
+                  fill={lowBackProg.active ? "url(#lowback-grad)" : inactiveFill}
                   fillOpacity={lowBackProg.active ? 0.25 + (lowBackProg.percent / 100) * 0.75 : 1}
-                  stroke={lowBackProg.active ? (lowBackProg.percent > 0 ? "#84cc16" : "rgba(132,204,22,0.35)") : "rgba(255,255,255,0.06)"}
+                  stroke={lowBackProg.active ? (lowBackProg.percent > 0 ? "#84cc16" : (isDarkMode ? "rgba(132,204,22,0.35)" : "rgba(132,204,22,0.55)")) : inactiveStroke}
                   strokeWidth="2"
                   className="transition-all duration-500"
                 />
@@ -576,7 +626,9 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
         {isFocusMode ? (
           <div className="flex flex-col gap-4">
             {/* Horizontal Exercise Bubble Navigator */}
-            <div className="liquid-glass rounded-2xl p-3 flex items-center justify-between gap-3 overflow-x-auto border border-white/5 scrollbar-none">
+            <div className={`rounded-2xl p-3 flex items-center justify-between gap-3 overflow-x-auto border scrollbar-none transition-colors duration-300 ${
+              isDarkMode ? "liquid-glass border-white/5" : "light-glass border-black/5"
+            }`}>
               <div className="flex items-center gap-2">
                 {workoutExercises.map((ex, idx) => {
                   const trackingEx = activeExercises.find((ae) => ae.exerciseId === ex.id);
@@ -589,15 +641,19 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
                       onClick={() => setActiveExIndex(idx)}
                       className={`h-9 px-3.5 rounded-xl border flex items-center justify-center gap-2 text-[10px] font-mono font-black uppercase tracking-wider transition-all select-none cursor-pointer ${
                         isActive
-                          ? "bg-pink-500/10 text-pink-400 border-pink-500/40 glow-pink"
+                          ? "bg-pink-500/10 text-pink-500 border-pink-500/40 " + (isDarkMode ? "glow-pink" : "")
                           : isDone
-                          ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                          : "bg-white/3 border-white/5 text-neutral-500 hover:text-white"
+                          ? isDarkMode 
+                            ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" 
+                            : "bg-emerald-500/8 border-emerald-500/20 text-emerald-600"
+                          : isDarkMode 
+                          ? "bg-white/3 border-white/5 text-neutral-500 hover:text-white" 
+                          : "bg-black/3 border-black/5 text-neutral-500 hover:text-neutral-900"
                       }`}
                     >
                       <span>{idx + 1}</span>
                       <span className="max-w-[70px] truncate hidden sm:block">{ex.name}</span>
-                      {isDone && <Check className="w-3 h-3 text-emerald-450 stroke-[3px]" />}
+                      {isDone && <Check className={`w-3 h-3 stroke-[3px] ${isDarkMode ? "text-emerald-450" : "text-emerald-600"}`} />}
                     </button>
                   );
                 })}
@@ -631,17 +687,24 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
                     swappingExId={swappingExId}
                     setSwappingExId={setSwappingExId}
                     handleSwapExercise={handleSwapExercise}
+                    isDarkMode={isDarkMode}
                   />
                 )}
               </motion.div>
             </AnimatePresence>
 
             {/* Smart Navigation Nudge bottom bar */}
-            <div className="flex justify-between items-center bg-black/30 p-4 rounded-2xl border border-white/5">
+            <div className={`flex justify-between items-center p-4 rounded-2xl border transition-colors duration-300 ${
+              isDarkMode ? "bg-black/30 border-white/5" : "bg-black/[0.01] border-black/5"
+            }`}>
               <button
                 disabled={activeExIndex === 0}
                 onClick={() => setActiveExIndex((prev) => prev - 1)}
-                className="px-4 py-2 text-[10px] font-mono font-black uppercase bg-white/3 border border-white/5 hover:bg-white/5 rounded-xl disabled:opacity-20 cursor-pointer"
+                className={`px-4 py-2 text-[10px] font-mono font-black uppercase rounded-xl disabled:opacity-20 cursor-pointer border transition-all ${
+                  isDarkMode 
+                    ? "bg-white/3 border-white/5 hover:bg-white/5 text-neutral-300" 
+                    : "bg-black/3 border-black/5 hover:bg-black/5 text-neutral-700"
+                }`}
               >
                 ← Prev Exercise
               </button>
@@ -659,12 +722,16 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
                       Next Exercise: {workoutExercises[activeExIndex + 1]?.name} →
                     </motion.button>
                   ) : (
-                    <span className="text-[10px] font-mono font-black text-pink-400 glow-pink uppercase tracking-widest animate-pulse">
+                    <span className={`text-[10px] font-mono font-black text-pink-500 uppercase tracking-widest animate-pulse ${
+                      isDarkMode ? "glow-pink" : ""
+                    }`}>
                       🎉 All movements complete! Lock in finished lift below.
                     </span>
                   )
                 ) : (
-                  <span className="text-[10px] font-mono font-bold text-neutral-550 uppercase tracking-wide">
+                  <span className={`text-[10px] font-mono font-bold uppercase tracking-wide ${
+                    isDarkMode ? "text-neutral-550" : "text-neutral-500"
+                  }`}>
                     Complete all sets to unlock next movement
                   </span>
                 )}
@@ -673,7 +740,11 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
               <button
                 disabled={activeExIndex === workoutExercises.length - 1}
                 onClick={() => setActiveExIndex((prev) => prev + 1)}
-                className="px-4 py-2 text-[10px] font-mono font-black uppercase bg-white/3 border border-white/5 hover:bg-white/5 rounded-xl disabled:opacity-20 cursor-pointer"
+                className={`px-4 py-2 text-[10px] font-mono font-black uppercase rounded-xl disabled:opacity-20 cursor-pointer border transition-all ${
+                  isDarkMode 
+                    ? "bg-white/3 border-white/5 hover:bg-white/5 text-neutral-300" 
+                    : "bg-black/3 border-black/5 hover:bg-black/5 text-neutral-700"
+                }`}
               >
                 Skip Next →
               </button>
@@ -699,6 +770,7 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
                   swappingExId={swappingExId}
                   setSwappingExId={setSwappingExId}
                   handleSwapExercise={handleSwapExercise}
+                  isDarkMode={isDarkMode}
                 />
               );
             })}
@@ -707,11 +779,17 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
       </main>
 
       {/* Persistent global footer workout-HUD buttons */}
-      <footer className="fixed bottom-0 left-0 right-0 z-40 bg-neutral-950/85 border-t border-white/5 px-4 py-4 flex items-center justify-center shadow-2xl backdrop-blur-xl pb-safe">
+      <footer className={`fixed bottom-0 left-0 right-0 z-40 border-t px-4 py-4 flex items-center justify-center shadow-2xl backdrop-blur-xl pb-safe transition-colors duration-300 ${
+        isDarkMode ? "bg-neutral-950/85 border-white/5" : "bg-white/85 border-black/5"
+      }`}>
         <div className="max-w-4xl w-full flex items-center justify-between gap-3 sm:gap-4">
           <button
             onClick={onCancel}
-            className="px-5 py-4 bg-white/3 hover:bg-white/5 border border-white/5 text-neutral-400 hover:text-white font-black text-xs md:text-sm tracking-wider uppercase rounded-xl transition-all cursor-pointer min-h-[48px]"
+            className={`px-5 py-4 border font-black text-xs md:text-sm tracking-wider uppercase rounded-xl transition-all cursor-pointer min-h-[48px] ${
+              isDarkMode 
+                ? "bg-white/3 hover:bg-white/5 border-white/5 text-neutral-455 hover:text-white" 
+                : "bg-black/3 hover:bg-black/5 border-black/10 text-neutral-600 hover:text-neutral-900"
+            }`}
           >
             Quit Session
           </button>
@@ -719,7 +797,11 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
           {onMinimize && (
             <button
               onClick={onMinimize}
-              className="flex-1 px-5 py-4 bg-white/3 hover:bg-white/5 border border-white/5 text-neutral-200 hover:text-white font-black text-xs md:text-sm tracking-wider uppercase rounded-xl transition-all text-center cursor-pointer min-h-[48px]"
+              className={`flex-1 px-5 py-4 border font-black text-xs md:text-sm tracking-wider uppercase rounded-xl transition-all text-center cursor-pointer min-h-[48px] ${
+                isDarkMode 
+                  ? "bg-white/3 hover:bg-white/5 border-white/5 text-neutral-200 hover:text-white" 
+                  : "bg-black/3 hover:bg-black/5 border-black/10 text-neutral-700 hover:text-neutral-900"
+              }`}
             >
               Minimize Workout
             </button>
@@ -743,7 +825,9 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className={`fixed inset-0 z-50 flex flex-col items-center justify-center p-6 text-center transition-colors duration-500 ${
-              isRestCompleted ? "bg-emerald-950/95 backdrop-blur-2xl" : "bg-[#050508]/95 backdrop-blur-xl"
+              isRestCompleted 
+                ? (isDarkMode ? "bg-emerald-950/95 backdrop-blur-2xl" : "bg-emerald-50/95 backdrop-blur-2xl") 
+                : (isDarkMode ? "bg-[#050508]/95 backdrop-blur-xl" : "bg-neutral-100/95 backdrop-blur-xl")
             }`}
           >
             {/* Visual Ring and Countdown Clock */}
@@ -755,7 +839,7 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
               
               <svg width="220" height="220" className="transform -rotate-90">
                 <circle
-                  stroke="rgba(255, 255, 255, 0.03)"
+                  stroke={isDarkMode ? "rgba(255, 255, 255, 0.03)" : "rgba(0, 0, 0, 0.03)"}
                   fill="transparent"
                   strokeWidth="10"
                   r="90"
@@ -794,16 +878,20 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
                     animate={{ scale: [0.9, 1.1, 1] }}
                     className="flex flex-col items-center"
                   >
-                    <Flame className="w-10 h-10 text-emerald-400 animate-bounce" />
-                    <span className="text-2xl font-black text-emerald-400 font-mono tracking-tight uppercase mt-1">GO TIME!</span>
+                    <Flame className={`w-10 h-10 animate-bounce ${isDarkMode ? "text-emerald-400" : "text-emerald-600"}`} />
+                    <span className={`text-2xl font-black font-mono tracking-tight uppercase mt-1 ${isDarkMode ? "text-emerald-400" : "text-emerald-600"}`}>GO TIME!</span>
                   </motion.div>
                 ) : (
                   <>
-                    <span className="text-xs text-neutral-500 font-mono font-black uppercase tracking-widest mb-1">Rest Remaining</span>
-                    <span className="text-5xl font-black text-white font-mono tracking-tighter drop-shadow-[0_0_12px_rgba(236,72,153,0.35)]">
+                    <span className={`text-xs font-mono font-black uppercase tracking-widest mb-1 ${isDarkMode ? "text-neutral-500" : "text-neutral-550"}`}>Rest Remaining</span>
+                    <span className={`text-5xl font-black font-mono tracking-tighter ${
+                      isDarkMode 
+                        ? "text-white drop-shadow-[0_0_12px_rgba(236,72,153,0.35)]" 
+                        : "text-neutral-900 drop-shadow-[0_0_8px_rgba(236,72,153,0.15)]"
+                    }`}>
                       {restSecondsLeft}s
                     </span>
-                    <span className="text-[9px] text-neutral-400 font-mono font-semibold uppercase tracking-widest mt-1">
+                    <span className={`text-[9px] font-mono font-semibold uppercase tracking-widest mt-1 ${isDarkMode ? "text-neutral-400" : "text-neutral-500"}`}>
                       of {restTotal}s
                     </span>
                   </>
@@ -812,13 +900,19 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
             </div>
 
             {/* Next Movement Hud Info */}
-            <div className="max-w-md bg-white/2 border border-white/5 p-5 rounded-[2rem] shadow-xl mb-10 text-center relative overflow-hidden">
+            <div className={`max-w-md border p-5 rounded-[2rem] shadow-xl mb-10 text-center relative overflow-hidden transition-colors duration-300 ${
+              isDarkMode ? "bg-white/2 border-white/5" : "bg-black/[0.02] border-black/5"
+            }`}>
               <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 to-rose-500/5 pointer-events-none" />
-              <span className="text-[10px] text-pink-500 font-mono font-black uppercase tracking-widest glow-pink block mb-1">NEXT SET TARGET</span>
-              <h3 className="text-lg font-extrabold text-white uppercase tracking-tight leading-tight">
+              <span className={`text-[10px] text-pink-500 font-mono font-black uppercase tracking-widest block mb-1 ${isDarkMode ? "glow-pink" : ""}`}>NEXT SET TARGET</span>
+              <h3 className={`text-lg font-extrabold uppercase tracking-tight leading-tight ${
+                isDarkMode ? "text-white" : "text-neutral-900"
+              }`}>
                 {nextWorkoutExName}
               </h3>
-              <p className="text-[11.5px] text-neutral-400 mt-2 font-medium">
+              <p className={`text-[11.5px] mt-2 font-medium ${
+                isDarkMode ? "text-neutral-400" : "text-neutral-600"
+              }`}>
                 Pack your shoulder blades, brace your core, and prepare for perfect range of motion.
               </p>
             </div>
@@ -831,7 +925,11 @@ export default function ActiveWorkout({ dayWorkout, userId, workoutLogs, onFinis
                     setRestSecondsLeft((prev) => (prev !== null ? prev + 30 : 30));
                     setRestTotal((prev) => prev + 30);
                   }}
-                  className="flex-1 bg-white/5 border border-white/10 px-6 py-4.5 rounded-2xl hover:bg-white/10 active:scale-95 transition-all text-sm font-mono font-black uppercase text-neutral-350 hover:text-white flex items-center justify-center gap-1.5 cursor-pointer min-h-[48px]"
+                  className={`flex-1 border px-6 py-4.5 rounded-2xl active:scale-95 transition-all text-sm font-mono font-black uppercase flex items-center justify-center gap-1.5 cursor-pointer min-h-[48px] ${
+                    isDarkMode 
+                      ? "bg-white/5 border-white/10 text-neutral-350 hover:bg-white/10 hover:text-white" 
+                      : "bg-black/3 border-black/10 text-neutral-600 hover:bg-black/5 hover:text-neutral-900"
+                  }`}
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>+30s Rest</span>
@@ -870,6 +968,7 @@ interface ActiveExerciseCardProps {
   swappingExId: string | null;
   setSwappingExId: (exId: string | null) => void;
   handleSwapExercise: (exId: string, altName: string) => void;
+  isDarkMode?: boolean;
 }
 
 function ActiveExerciseCard({
@@ -884,7 +983,8 @@ function ActiveExerciseCard({
   getPreviousPerformance,
   swappingExId,
   setSwappingExId,
-  handleSwapExercise
+  handleSwapExercise,
+  isDarkMode = true
 }: ActiveExerciseCardProps) {
   const [showGizmo, setShowGizmo] = useState(false);
   const [extra, setExtra] = useState<ExerciseExtraInfo | null>(null);
@@ -912,7 +1012,9 @@ function ActiveExerciseCard({
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="liquid-glass rounded-[2rem] overflow-hidden shadow-lg border border-white/5 group relative"
+      className={`rounded-[2rem] overflow-hidden shadow-lg border group relative transition-colors duration-300 ${
+        isDarkMode ? "liquid-glass border-white/5" : "light-glass border-black/5"
+      }`}
       id={`exercise-card-${ex.id}`}
     >
       {/* Exercise Swap Selection Overlay Dropdown */}
@@ -922,12 +1024,14 @@ function ActiveExerciseCard({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/90 backdrop-blur-md z-30 p-6 flex flex-col justify-center items-center gap-4"
+            className={`absolute inset-0 backdrop-blur-md z-30 p-6 flex flex-col justify-center items-center gap-4 transition-colors duration-300 ${
+              isDarkMode ? "bg-black/90" : "bg-white/95"
+            }`}
           >
             <div className="text-center">
-              <span className="text-[9px] font-mono font-black text-pink-500 uppercase tracking-widest glow-pink block mb-1">Equipment Busy?</span>
-              <h4 className="text-sm font-extrabold text-white uppercase tracking-tight">Swap "{ex.name}"</h4>
-              <p className="text-[10px] text-neutral-400 mt-1 max-w-xs leading-relaxed">
+              <span className={`text-[9px] font-mono font-black text-pink-500 uppercase tracking-widest block mb-1 ${isDarkMode ? "glow-pink" : ""}`}>Equipment Busy?</span>
+              <h4 className={`text-sm font-extrabold uppercase tracking-tight ${isDarkMode ? "text-white" : "text-neutral-900"}`}>Swap "{ex.name}"</h4>
+              <p className={`text-[10px] mt-1 max-w-xs leading-relaxed ${isDarkMode ? "text-neutral-400" : "text-neutral-600"}`}>
                 Substitute this workout with a predefined biomechanically matching hypertrophy alternative.
               </p>
             </div>
@@ -938,7 +1042,11 @@ function ActiveExerciseCard({
                   <button
                     key={i}
                     onClick={() => handleSwapExercise(ex.id, alt)}
-                    className="px-4 py-2.5 bg-white/3 border border-white/5 hover:border-pink-550/30 hover:bg-pink-500/5 text-white font-mono font-black text-[9.5px] uppercase tracking-wider rounded-xl transition-all cursor-pointer text-left flex items-center justify-between"
+                    className={`px-4 py-2.5 border font-mono font-black text-[9.5px] uppercase tracking-wider rounded-xl transition-all cursor-pointer text-left flex items-center justify-between ${
+                      isDarkMode 
+                        ? "bg-white/3 border-white/5 hover:border-pink-500/30 hover:bg-pink-500/5 text-white" 
+                        : "bg-black/3 border-black/10 hover:border-pink-500/30 hover:bg-pink-500/5 text-neutral-800"
+                    }`}
                   >
                     <span>{alt}</span>
                     <RefreshCw className="w-3 h-3 text-pink-500" />
@@ -950,7 +1058,9 @@ function ActiveExerciseCard({
 
               <button
                 onClick={() => setSwappingExId(null)}
-                className="mt-2 text-[9px] font-mono font-black uppercase text-neutral-500 hover:text-white py-1 select-none cursor-pointer"
+                className={`mt-2 text-[9px] font-mono font-black uppercase py-1 select-none cursor-pointer ${
+                  isDarkMode ? "text-neutral-550 hover:text-white" : "text-neutral-500 hover:text-neutral-900"
+                }`}
               >
                 Cancel Swap
               </button>
@@ -960,29 +1070,39 @@ function ActiveExerciseCard({
       </AnimatePresence>
 
       {/* Exercise banner */}
-      <div className="bg-white/3 px-5 py-4 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className={`px-5 py-4 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors duration-300 ${
+        isDarkMode ? "bg-white/3 border-white/5" : "bg-black/[0.02] border-black/5"
+      }`}>
         <div>
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="px-2.5 py-0.5 text-[9px] bg-pink-500/10 text-pink-400 border border-pink-500/20 font-mono font-black rounded-full uppercase tracking-wider glow-pink">
+            <span className={`px-2.5 py-0.5 text-[9px] bg-pink-500/10 text-pink-500 border border-pink-500/20 font-mono font-black rounded-full uppercase tracking-wider ${isDarkMode ? "glow-pink" : ""}`}>
               {ex.category}
             </span>
-            <span className="px-2.5 py-0.5 text-[9px] bg-white/5 text-neutral-350 border border-white/5 font-mono rounded-full font-bold">
+            <span className={`px-2.5 py-0.5 text-[9px] border font-mono rounded-full font-bold ${
+              isDarkMode ? "bg-white/5 text-neutral-350 border-white/5" : "bg-black/5 text-neutral-700 border-black/5"
+            }`}>
               ⏱️ {ex.rest} REST
             </span>
             {ex.alternatives && ex.alternatives.length > 0 && (
               <button
                 onClick={() => setSwappingExId(ex.id)}
-                className="flex items-center gap-1 px-2.5 py-0.5 text-[8.5px] bg-lime-500/10 text-lime-400 border border-lime-500/20 font-mono rounded-full font-black uppercase hover:bg-lime-550/20 cursor-pointer transition-all ml-1"
+                className={`flex items-center gap-1 px-2.5 py-0.5 text-[8.5px] border font-mono rounded-full font-black uppercase hover:bg-lime-500/20 cursor-pointer transition-all ml-1 ${
+                  isDarkMode ? "bg-lime-500/10 text-lime-400 border-lime-500/20" : "bg-lime-500/10 text-lime-700 border-lime-500/20"
+                }`}
                 title="Swap with Alternative Exercise"
               >
                 <RefreshCw className="w-2.5 h-2.5 animate-spin-slow" /> Swap
               </button>
             )}
           </div>
-          <h3 className="text-sm sm:text-base font-extrabold text-white mt-2.5 uppercase tracking-tight group-hover:text-pink-500 transition-colors">
+          <h3 className={`text-sm sm:text-base font-extrabold mt-2.5 uppercase tracking-tight group-hover:text-pink-500 transition-colors ${
+            isDarkMode ? "text-white" : "text-neutral-900"
+          }`}>
             {ex.name}
           </h3>
-          <p className="text-[10px] text-neutral-400 font-mono mt-0.5 uppercase tracking-wider font-bold">{ex.target}</p>
+          <p className={`text-[10px] font-mono mt-0.5 uppercase tracking-wider font-bold ${
+            isDarkMode ? "text-neutral-400" : "text-neutral-500"
+          }`}>{ex.target}</p>
         </div>
         
         <div className="flex items-center gap-2">
@@ -991,8 +1111,10 @@ function ActiveExerciseCard({
             onClick={() => setShowGizmo(!showGizmo)}
             className={`flex items-center gap-1.5 text-[9px] font-mono font-black uppercase tracking-wider px-3 py-2 rounded-xl border transition-all select-none cursor-pointer ${
               showGizmo
-                ? "bg-pink-500/10 text-pink-400 border-pink-500/30 glow-pink"
-                : "bg-white/3 text-neutral-450 border-white/5 hover:text-white hover:bg-white/5"
+                ? "bg-pink-500/10 text-pink-500 border-pink-500/30 " + (isDarkMode ? "glow-pink" : "")
+                : isDarkMode 
+                ? "bg-white/3 text-neutral-450 border-white/5 hover:text-white hover:bg-white/5" 
+                : "bg-black/3 text-neutral-600 border-black/10 hover:text-neutral-900 hover:bg-black/5"
             }`}
             title="Toggle Live Demo & Alternate Drill"
           >
@@ -1002,7 +1124,11 @@ function ActiveExerciseCard({
 
           <button
             onClick={() => onViewDetails(ex)}
-            className="flex items-center gap-1 text-[9px] font-mono font-black uppercase tracking-wider text-neutral-450 hover:text-white bg-white/3 hover:bg-white/5 border border-white/5 px-3 py-2 rounded-xl transition-all select-none cursor-pointer"
+            className={`flex items-center gap-1 text-[9px] font-mono font-black uppercase tracking-wider border px-3 py-2 rounded-xl transition-all select-none cursor-pointer ${
+              isDarkMode 
+                ? "text-neutral-450 hover:text-white bg-white/3 hover:bg-white/5 border-white/5" 
+                : "text-neutral-600 hover:text-neutral-900 bg-black/3 hover:bg-black/5 border-black/10"
+            }`}
           >
             <HelpCircle className="w-3.5 h-3.5 text-neutral-405" />
             <span>Guide</span>
@@ -1011,9 +1137,11 @@ function ActiveExerciseCard({
       </div>
 
       {/* Progressive Overload Alert Banner */}
-      <div className="px-5 py-3 border-b border-white/5 bg-pink-500/2 flex items-start gap-2">
-        <span className="text-[10px] font-black text-pink-500 font-mono mt-0.5 tracking-wider uppercase shrink-0 glow-pink">Target: </span>
-        <p className="text-[11px] text-neutral-300 leading-relaxed font-sans font-medium">{overload.message}</p>
+      <div className={`px-5 py-3 border-b flex items-start gap-2 transition-colors duration-300 ${
+        isDarkMode ? "border-white/5 bg-pink-500/2" : "border-black/5 bg-pink-500/[0.03]"
+      }`}>
+        <span className={`text-[10px] font-black text-pink-500 font-mono mt-0.5 tracking-wider uppercase shrink-0 ${isDarkMode ? "glow-pink" : ""}`}>Target: </span>
+        <p className={`text-[11px] leading-relaxed font-sans font-medium ${isDarkMode ? "text-neutral-300" : "text-neutral-750"}`}>{overload.message}</p>
       </div>
 
       {/* Toggleable WorkoutX GIF and Alternate Exercise visual board */}
@@ -1023,7 +1151,9 @@ function ActiveExerciseCard({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="border-b border-white/5 bg-black/30 overflow-hidden"
+            className={`border-b overflow-hidden transition-colors duration-300 ${
+              isDarkMode ? "border-white/5 bg-black/30" : "border-black/5 bg-black/[0.01]"
+            }`}
           >
             <div className="p-4 flex flex-col md:flex-row gap-4">
               {/* GIF Player Box */}
@@ -1033,24 +1163,32 @@ function ActiveExerciseCard({
                 </span>
                 
                 {fetching ? (
-                  <div className="aspect-video w-full rounded-2xl bg-black/40 border border-white/5 flex flex-col items-center justify-center gap-2 min-h-[140px]">
+                  <div className={`aspect-video w-full rounded-2xl flex flex-col items-center justify-center gap-2 min-h-[140px] border ${
+                    isDarkMode ? "bg-black/40 border-white/5" : "bg-black/[0.03] border-black/5"
+                  }`}>
                     <div className="w-5 h-5 rounded-full border-2 border-pink-500 border-t-transparent animate-spin" />
                     <span className="text-[9px] font-mono text-neutral-500 uppercase font-bold">LOAD STREAM...</span>
                   </div>
                 ) : extra?.gifUrl && !mediaErr ? (
-                  <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black/40 border border-white/5 flex items-center justify-center p-1.5 min-h-[140px]">
+                  <div className={`relative aspect-video w-full rounded-2xl overflow-hidden flex items-center justify-center p-1.5 min-h-[140px] border ${
+                    isDarkMode ? "bg-black/40 border-white/5" : "bg-black/[0.03] border-black/5"
+                  }`}>
                     <img
                       src={extra.gifUrl}
                       alt={ex.name}
-                      className="h-full max-h-[140px] object-contain mx-auto mix-blend-lighten pointer-events-none rounded-lg"
+                      className={`h-full max-h-[140px] object-contain mx-auto pointer-events-none rounded-lg ${
+                        isDarkMode ? "mix-blend-lighten" : "mix-blend-normal"
+                      }`}
                       referrerPolicy="no-referrer"
                       onError={() => setMediaErr(true)}
                     />
                   </div>
                 ) : (
-                  <div className="aspect-video w-full rounded-2xl bg-black/45 border border-white/5 flex flex-col items-center justify-center p-3 text-center min-h-[140px]">
-                    <span className="text-[10px] text-pink-500 font-black uppercase tracking-wider glow-pink">STREAM OFFLINE</span>
-                    <span className="text-[9px] text-neutral-500 mt-1 uppercase font-bold">Use Alternatives Below</span>
+                  <div className={`aspect-video w-full rounded-2xl flex flex-col items-center justify-center p-3 text-center min-h-[140px] border ${
+                    isDarkMode ? "bg-black/45 border-white/5" : "bg-black/[0.03] border-black/5"
+                  }`}>
+                    <span className={`text-[10px] text-pink-500 font-black uppercase tracking-wider ${isDarkMode ? "glow-pink" : ""}`}>STREAM OFFLINE</span>
+                    <span className="text-[9px] text-neutral-550 mt-1 uppercase font-bold">Use Alternatives Below</span>
                   </div>
                 )}
               </div>
@@ -1063,7 +1201,9 @@ function ActiveExerciseCard({
                   </span>
                   {/* Small tabs for checking alternatives */}
                   {extra && extra.alternatives && (
-                    <div className="flex gap-0.5 bg-black/50 p-0.5 rounded-lg border border-white/5">
+                    <div className={`flex gap-0.5 p-0.5 rounded-lg border ${
+                      isDarkMode ? "bg-black/50 border-white/5" : "bg-black/10 border-black/5"
+                    }`}>
                       {[0, 1, 2].map((idx) => (
                         <button
                           key={idx}
@@ -1071,7 +1211,9 @@ function ActiveExerciseCard({
                           className={`text-[8.5px] font-mono font-black px-2 py-0.5 rounded transition-all select-none cursor-pointer ${
                             activeAltIdx === idx
                               ? "bg-pink-500 text-white shadow-[0_0_10px_rgba(236,72,153,0.3)]"
-                              : "text-neutral-550 hover:text-white"
+                              : isDarkMode 
+                              ? "text-neutral-455 hover:text-white" 
+                              : "text-neutral-600 hover:text-neutral-900"
                           }`}
                         >
                           Alt {idx + 1}
@@ -1082,19 +1224,29 @@ function ActiveExerciseCard({
                 </div>
                 
                 {extra && extra.alternatives ? (
-                  <div className="bg-black/20 border border-white/5 p-3 rounded-2xl flex-1 flex flex-col justify-between" key={activeAltIdx}>
+                  <div className={`border p-3 rounded-2xl flex-1 flex flex-col justify-between transition-colors duration-300 ${
+                    isDarkMode ? "bg-black/20 border-white/5" : "bg-black/[0.02] border-black/5"
+                  }`} key={activeAltIdx}>
                     <div>
                       {extra.alternatives[activeAltIdx] && (
                         <>
-                          <div className="flex items-center justify-between gap-2 border-b border-white/5 pb-1.5">
-                            <h4 className="text-[10.5px] font-black text-white uppercase tracking-tight truncate max-w-[150px]" title={extra.alternatives[activeAltIdx].name}>
+                          <div className={`flex items-center justify-between gap-2 border-b pb-1.5 ${
+                            isDarkMode ? "border-white/5" : "border-black/5"
+                          }`}>
+                            <h4 className={`text-[10.5px] font-black uppercase tracking-tight truncate max-w-[150px] ${
+                              isDarkMode ? "text-white" : "text-neutral-850"
+                            }`} title={extra.alternatives[activeAltIdx].name}>
                               {extra.alternatives[activeAltIdx].name}
                             </h4>
-                            <span className="text-[8px] font-mono font-black text-pink-400 bg-pink-500/10 border border-pink-500/20 px-2 py-0.5 rounded-full uppercase shrink-0 glow-pink">
+                            <span className={`text-[8px] font-mono font-black bg-pink-500/10 text-pink-500 border border-pink-500/20 px-2 py-0.5 rounded-full uppercase shrink-0 ${
+                              isDarkMode ? "glow-pink" : ""
+                            }`}>
                               {extra.alternatives[activeAltIdx].target}
                             </span>
                           </div>
-                          <p className="text-[10.5px] text-neutral-300 leading-snug font-sans mt-1.5 line-clamp-3" title={extra.alternatives[activeAltIdx].instructions.join(" ")}>
+                          <p className={`text-[10.5px] leading-snug font-sans mt-1.5 line-clamp-3 ${
+                            isDarkMode ? "text-neutral-300" : "text-neutral-600"
+                          }`} title={extra.alternatives[activeAltIdx].instructions.join(" ")}>
                             {extra.alternatives[activeAltIdx].instructions[0] || "Execute with absolute posture control."}
                           </p>
                         </>
@@ -1106,14 +1258,20 @@ function ActiveExerciseCard({
                       href={extra.googleSearchUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="mt-3 inline-flex items-center justify-center gap-2 w-full py-2 px-3 rounded-xl border border-white/5 hover:border-pink-500/30 hover:bg-pink-500/5 text-neutral-400 hover:text-white transition-all text-[9px] font-mono font-black tracking-wider uppercase"
+                      className={`mt-3 inline-flex items-center justify-center gap-2 w-full py-2 px-3 rounded-xl border transition-all text-[9px] font-mono font-black tracking-wider uppercase ${
+                        isDarkMode 
+                          ? "border-white/5 hover:border-pink-500/30 hover:bg-pink-500/5 text-neutral-400 hover:text-white" 
+                          : "border-black/10 hover:border-pink-500/30 hover:bg-pink-500/5 text-neutral-600 hover:text-neutral-900"
+                      }`}
                     >
                       <Search className="w-3 h-3 text-pink-500" />
                       <span>OPEN FORM ON GOOGLE</span>
                     </a>
                   </div>
                 ) : (
-                  <div className="bg-black/20 border border-white/5 rounded-2xl p-4 flex-1 flex items-center justify-center min-h-[120px]">
+                  <div className={`rounded-2xl p-4 flex-1 flex items-center justify-center min-h-[120px] border ${
+                    isDarkMode ? "bg-black/20 border-white/5" : "bg-black/[0.02] border-black/5"
+                  }`}>
                     <span className="text-[9px] text-neutral-500 font-mono font-bold uppercase tracking-wider">Alternative Loading...</span>
                   </div>
                 )}
@@ -1124,9 +1282,13 @@ function ActiveExerciseCard({
       </AnimatePresence>
 
       {/* Set log grid */}
-      <div className="p-4 flex flex-col gap-1.5 bg-black/10 rounded-b-[2rem]">
+      <div className={`p-4 flex flex-col gap-1.5 rounded-b-[2rem] transition-colors duration-300 ${
+        isDarkMode ? "bg-black/10" : "bg-black/[0.02]"
+      }`}>
         {/* Grid header */}
-        <div className="grid grid-cols-12 gap-2 text-center text-[9px] font-mono font-black text-neutral-500 uppercase tracking-widest pb-2 border-b border-white/5 px-2">
+        <div className={`grid grid-cols-12 gap-2 text-center text-[9px] font-mono font-black text-neutral-500 uppercase tracking-widest pb-2 border-b px-2 ${
+          isDarkMode ? "border-white/5" : "border-black/5"
+        }`}>
           <div className="col-span-2 text-center">SET</div>
           <div className="col-span-4">LBS (WEIGHT)</div>
           <div className="col-span-4">REPS</div>
@@ -1142,13 +1304,19 @@ function ActiveExerciseCard({
               key={set.setIndex}
               className={`flex flex-col gap-1 py-2 px-3 rounded-xl border transition-all ${
                 set.completed
-                  ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-400"
-                  : "bg-white/2 border-white/5 text-neutral-350"
+                  ? isDarkMode 
+                    ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-400" 
+                    : "bg-emerald-500/[0.03] border-emerald-500/25 text-emerald-700"
+                  : isDarkMode 
+                  ? "bg-white/2 border-white/5 text-neutral-350" 
+                  : "bg-white border-black/5 text-neutral-800"
               }`}
             >
               <div className="grid grid-cols-12 gap-2 items-center">
                 {/* Set count index */}
-                <div className="col-span-2 font-mono text-[11px] font-black text-center text-neutral-450">
+                <div className={`col-span-2 font-mono text-[11px] font-black text-center ${
+                  isDarkMode ? "text-neutral-450" : "text-neutral-500"
+                }`}>
                   {set.setIndex}
                 </div>
 
@@ -1157,17 +1325,27 @@ function ActiveExerciseCard({
                   <button
                     disabled={set.completed}
                     onClick={() => handleUpdateWeight(ex.id, set.setIndex, -5)}
-                    className="w-11 h-11 md:w-9 md:h-9 flex items-center justify-center bg-white/3 hover:bg-white/7 disabled:opacity-10 text-white text-sm md:text-xs font-black rounded-full border border-white/5 transition-all cursor-pointer active:scale-90"
+                    className={`w-11 h-11 md:w-9 md:h-9 flex items-center justify-center disabled:opacity-10 text-sm md:text-xs font-black rounded-full border transition-all cursor-pointer active:scale-90 ${
+                      isDarkMode 
+                        ? "bg-white/3 hover:bg-white/7 text-white border-white/5" 
+                        : "bg-black/3 hover:bg-black/7 text-neutral-800 border-black/10"
+                    }`}
                   >
                     -
                   </button>
-                  <span className="font-mono text-sm md:text-xs font-black w-9 text-center text-white">
+                  <span className={`font-mono text-sm md:text-xs font-black w-9 text-center ${
+                    isDarkMode ? "text-white" : "text-neutral-800"
+                  }`}>
                     {set.weight}
                   </span>
                   <button
                     disabled={set.completed}
                     onClick={() => handleUpdateWeight(ex.id, set.setIndex, 5)}
-                    className="w-11 h-11 md:w-9 md:h-9 flex items-center justify-center bg-white/3 hover:bg-white/7 disabled:opacity-10 text-white text-sm md:text-xs font-black rounded-full border border-white/5 transition-all cursor-pointer active:scale-90"
+                    className={`w-11 h-11 md:w-9 md:h-9 flex items-center justify-center disabled:opacity-10 text-sm md:text-xs font-black rounded-full border transition-all cursor-pointer active:scale-90 ${
+                      isDarkMode 
+                        ? "bg-white/3 hover:bg-white/7 text-white border-white/5" 
+                        : "bg-black/3 hover:bg-black/7 text-neutral-800 border-black/10"
+                    }`}
                   >
                     +
                   </button>
@@ -1178,17 +1356,27 @@ function ActiveExerciseCard({
                   <button
                     disabled={set.completed}
                     onClick={() => handleUpdateRep(ex.id, set.setIndex, -1)}
-                    className="w-11 h-11 md:w-9 md:h-9 flex items-center justify-center bg-white/3 hover:bg-white/7 disabled:opacity-10 text-white text-sm md:text-xs font-black rounded-full border border-white/5 transition-all cursor-pointer active:scale-90"
+                    className={`w-11 h-11 md:w-9 md:h-9 flex items-center justify-center disabled:opacity-10 text-sm md:text-xs font-black rounded-full border transition-all cursor-pointer active:scale-90 ${
+                      isDarkMode 
+                        ? "bg-white/3 hover:bg-white/7 text-white border-white/5" 
+                        : "bg-black/3 hover:bg-black/7 text-neutral-800 border-black/10"
+                    }`}
                   >
                     -
                   </button>
-                  <span className="font-mono text-sm md:text-xs font-black w-8 text-center text-white">
+                  <span className={`font-mono text-sm md:text-xs font-black w-8 text-center ${
+                    isDarkMode ? "text-white" : "text-neutral-800"
+                  }`}>
                     {set.reps}
                   </span>
                   <button
                     disabled={set.completed}
                     onClick={() => handleUpdateRep(ex.id, set.setIndex, 1)}
-                    className="w-11 h-11 md:w-9 md:h-9 flex items-center justify-center bg-white/3 hover:bg-white/7 disabled:opacity-10 text-white text-sm md:text-xs font-black rounded-full border border-white/5 transition-all cursor-pointer active:scale-90"
+                    className={`w-11 h-11 md:w-9 md:h-9 flex items-center justify-center disabled:opacity-10 text-sm md:text-xs font-black rounded-full border transition-all cursor-pointer active:scale-90 ${
+                      isDarkMode 
+                        ? "bg-white/3 hover:bg-white/7 text-white border-white/5" 
+                        : "bg-black/3 hover:bg-black/7 text-neutral-800 border-black/10"
+                    }`}
                   >
                     +
                   </button>
@@ -1200,8 +1388,10 @@ function ActiveExerciseCard({
                     onClick={() => handleToggleComplete(ex.id, set.setIndex)}
                     className={`w-11 h-11 md:w-9 md:h-9 flex items-center justify-center rounded-full border transition-all cursor-pointer ${
                       set.completed
-                        ? "bg-emerald-500 border-emerald-500 text-neutral-950 shadow-[0_0_12px_rgba(16,185,129,0.4)]"
-                        : "border-white/10 hover:border-pink-500/50 hover:bg-pink-500/10 text-transparent"
+                        ? "bg-emerald-500 border-emerald-500 text-neutral-950 " + (isDarkMode ? "shadow-[0_0_12px_rgba(16,185,129,0.4)]" : "")
+                        : isDarkMode
+                        ? "border-white/10 hover:border-pink-500/50 hover:bg-pink-500/10 text-transparent"
+                        : "border-black/15 hover:border-pink-500/50 hover:bg-pink-500/10 text-transparent"
                     }`}
                   >
                     <Check className="w-5 h-5 md:w-4 md:h-4" strokeWidth={3.5} />
@@ -1211,9 +1401,11 @@ function ActiveExerciseCard({
 
               {/* Set-by-Set Progressive Overload Prompt */}
               {prevSet && (
-                <div className="pl-14 text-[9px] font-mono font-bold text-neutral-500 flex items-center gap-1.5 select-none">
+                <div className={`pl-14 text-[9px] font-mono font-bold flex items-center gap-1.5 select-none ${
+                  isDarkMode ? "text-neutral-500" : "text-neutral-550"
+                }`}>
                   <span className="w-1.5 h-1.5 rounded-full bg-pink-500/40 inline-block" />
-                  <span>Last Session Bench: <span className="text-neutral-400 font-extrabold">{prevSet.weight} lbs</span> x {prevSet.reps} reps</span>
+                  <span>Last Session Bench: <span className={`font-extrabold ${isDarkMode ? "text-neutral-400" : "text-neutral-700"}`}>{prevSet.weight} lbs</span> x {prevSet.reps} reps</span>
                 </div>
               )}
             </div>
