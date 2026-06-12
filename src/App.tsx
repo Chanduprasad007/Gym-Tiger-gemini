@@ -25,7 +25,9 @@ import {
   Lock,
   Edit2,
   Check,
-  ChevronUp
+  ChevronUp,
+  Sun,
+  Moon
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -35,6 +37,16 @@ export default function App() {
   const [activeWorkout, setActiveWorkout] = useState<DayWorkout | null>(null);
   const [isWorkoutMinimized, setIsWorkoutMinimized] = useState(false);
   const [selectedGuide, setSelectedGuide] = useState<Exercise | null>(null);
+
+  // Theme State
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    const cached = localStorage.getItem("theme");
+    return cached === null ? true : cached !== "light";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("theme", isDarkMode ? "dark" : "light");
+  }, [isDarkMode]);
 
   // Authentication & Guest State
   const [currentUser, setCurrentUser] = useState<UserStats | null>(null);
@@ -442,28 +454,34 @@ export default function App() {
         }}
         onMinimize={() => setIsWorkoutMinimized(true)}
         onViewDetails={(ex) => setSelectedGuide(ex)}
+        isDarkMode={isDarkMode}
       />
     );
   }
 
 
-
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-200 flex flex-col font-sans relative pb-28 md:pb-12 overflow-hidden animate-fade-in" id="gym-gemini-root">
+    <div className={`min-h-screen flex flex-col font-sans relative pb-28 md:pb-12 overflow-hidden animate-fade-in transition-colors duration-300 ${
+      isDarkMode ? "bg-neutral-950 text-neutral-200" : "bg-neutral-50 text-neutral-800"
+    }`} id="gym-gemini-root">
       {/* Background Animated Blobs */}
-      <div className="absolute top-[-10%] left-[-15%] w-[60vw] h-[60vw] max-w-[600px] bg-pink-500/10 rounded-full blur-[140px] animate-blob-1 pointer-events-none z-0" />
-      <div className="absolute bottom-[-10%] right-[-15%] w-[60vw] h-[60vw] max-w-[600px] bg-lime-500/10 rounded-full blur-[140px] animate-blob-2 pointer-events-none z-0" />
-      <div className="absolute top-[30%] left-[50%] -translate-x-1/2 w-[50vw] h-[50vw] max-w-[500px] bg-cyan-500/8 rounded-full blur-[140px] animate-blob-3 pointer-events-none z-0" />
+      <div className={`absolute top-[-10%] left-[-15%] w-[60vw] h-[60vw] max-w-[600px] rounded-full blur-[140px] animate-blob-1 pointer-events-none z-0 transition-colors duration-500 ${isDarkMode ? "bg-pink-500/10" : "bg-pink-500/[0.06]"}`} />
+      <div className={`absolute bottom-[-10%] right-[-15%] w-[60vw] h-[60vw] max-w-[600px] rounded-full blur-[140px] animate-blob-2 pointer-events-none z-0 transition-colors duration-500 ${isDarkMode ? "bg-lime-500/10" : "bg-lime-500/[0.06]"}`} />
+      <div className={`absolute top-[30%] left-[50%] -translate-x-1/2 w-[50vw] h-[50vw] max-w-[500px] rounded-full blur-[140px] animate-blob-3 pointer-events-none z-0 transition-colors duration-500 ${isDarkMode ? "bg-cyan-500/8" : "bg-cyan-500/[0.04]"}`} />
 
       {/* Dynamic Tiger HUD Bar */}
-      <nav className="sticky top-0 z-45 bg-[#050508]/80 backdrop-blur-xl border-b border-white/5 px-4 py-3.5 shadow-2xl shadow-black/10 select-none relative">
+      <nav className={`sticky top-0 z-45 backdrop-blur-xl border-b px-4 py-3.5 select-none relative transition-colors duration-300 ${
+        isDarkMode ? "bg-[#050508]/80 border-white/5 shadow-2xl shadow-black/10" : "bg-white/80 border-black/5 shadow-md shadow-black/[0.02]"
+      }`}>
         <div className="max-w-6xl w-full mx-auto flex items-center justify-between relative z-10">
           {/* Logo brand */}
           <div className="flex items-center gap-2">
             <div className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-2.5 py-1 rounded-[0.8rem] flex items-center justify-center font-extrabold text-sm tracking-tighter shadow-md shadow-pink-500/20">
               G
             </div>
-            <h1 className="text-sm font-black font-sans uppercase tracking-widest text-white flex items-center gap-1.5 leading-none">
+            <h1 className={`text-sm font-black font-sans uppercase tracking-widest flex items-center gap-1.5 leading-none ${
+              isDarkMode ? "text-white" : "text-neutral-900"
+            }`}>
               GYM - GEMINI
               <span className="text-[8px] bg-pink-500/15 text-pink-400 px-1.5 py-0.5 rounded border border-pink-500/10 font-mono font-semibold">
                 STRENGTH
@@ -473,9 +491,26 @@ export default function App() {
 
           {/* Cloud Auth / Profile HUD */}
           <div className="flex items-center gap-2">
+            {/* Theme Toggle Switch */}
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className={`p-2 rounded-xl border flex items-center justify-center transition-all active:scale-95 cursor-pointer min-h-[36px] min-w-[36px] ${
+                isDarkMode 
+                  ? "bg-white/3 border-white/5 text-neutral-400 hover:bg-white/7 hover:text-white" 
+                  : "bg-black/3 border-black/5 text-neutral-600 hover:bg-black/5 hover:text-neutral-800"
+              }`}
+              title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {isDarkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-500" />}
+            </button>
+
             <button
               onClick={() => setShowGitHubGuide(true)}
-              className="px-3 py-1.5 bg-white/3 hover:bg-white/7 hover:text-white text-neutral-400 border border-white/5 rounded-xl flex items-center gap-1.5 transition-all active:scale-95 text-xs font-bold"
+              className={`px-3 py-1.5 border rounded-xl flex items-center gap-1.5 transition-all active:scale-95 text-xs font-bold ${
+                isDarkMode
+                  ? "bg-white/3 border-white/5 text-neutral-400 hover:bg-white/7 hover:text-white"
+                  : "bg-black/3 border-black/5 text-neutral-600 hover:bg-black/7 hover:text-neutral-800"
+              }`}
               id="github-guide-trigger"
             >
               <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 16 16" version="1.1" aria-hidden="true">
@@ -486,13 +521,19 @@ export default function App() {
 
             <div 
               onClick={() => setIsEditingProfile(true)}
-              className="flex items-center gap-2 bg-white/3 border border-white/5 p-1 rounded-full pr-4 cursor-pointer hover:bg-white/5 hover:border-pink-500/30 transition-all select-none active:scale-98"
+              className={`flex items-center gap-2 border p-1 rounded-full pr-4 cursor-pointer transition-all select-none active:scale-98 ${
+                isDarkMode 
+                  ? "bg-white/3 border-white/5 hover:bg-white/5 hover:border-pink-500/30" 
+                  : "bg-black/3 border-black/5 hover:bg-black/5 hover:border-pink-500/30"
+              }`}
             >
               <div className="w-6 h-6 rounded-full bg-pink-500 flex items-center justify-center text-black font-extrabold text-xs shadow shadow-pink-500/30 uppercase animate-pulse">
                 {currentUser?.displayName?.charAt(0).toUpperCase() || "A"}
               </div>
               <div className="hidden sm:block text-left">
-                <p className="text-[10px] font-bold text-neutral-350 capitalize truncate max-w-24 leading-none">{currentUser?.displayName || "Athlete"}</p>
+                <p className={`text-[10px] font-bold capitalize truncate max-w-24 leading-none ${
+                  isDarkMode ? "text-neutral-350" : "text-neutral-700"
+                }`}>{currentUser?.displayName || "Athlete"}</p>
                 <p className="text-[7px] text-pink-400 font-mono flex items-center gap-0.5 mt-0.5 leading-none font-bold">
                   LOCAL SESSION
                 </p>
@@ -506,26 +547,28 @@ export default function App() {
       <header className="px-4 py-8 relative z-10">
         <div className="max-w-6xl w-full mx-auto flex flex-col md:flex-row md:items-center justify-between gap-8">
           <div className="flex-1">
-            <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight uppercase leading-none animate-fade-in">
+            <h2 className={`text-3xl md:text-5xl font-black tracking-tight uppercase leading-none animate-fade-in ${
+              isDarkMode ? "text-white" : "text-neutral-900"
+            }`}>
               SCULPT THE <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-rose-500 to-orange-500 glow-pink">
+              <span className={`text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-rose-500 to-orange-500 ${isDarkMode ? "glow-pink" : ""}`}>
                 V-TAPER PHYSIQUE.
               </span>
             </h2>
-            <p className="text-xs text-neutral-450 mt-3 max-w-xl font-mono uppercase tracking-wider font-extrabold glow-pink">
+            <p className={`text-xs mt-3 max-w-xl font-mono uppercase tracking-wider font-extrabold ${
+              isDarkMode ? "text-neutral-450 glow-pink" : "text-neutral-550"
+            }`}>
               ⚡ Distraction-free hypertrophy & strength engine.
             </p>
             
             {/* focusTags visual badges */}
             <div className="flex flex-wrap gap-2 mt-5">
-              <span className="text-[9px] font-mono font-bold text-neutral-500 uppercase tracking-widest self-center mr-1">Current Focus:</span>
               {focusTags.map((tag, idx) => {
                 const colors: Record<string, string> = {
-                  lime: "bg-lime-500/10 text-lime-400 border-lime-500/20",
-                  orange: "bg-orange-500/10 text-orange-400 border-orange-500/20",
-                  cyan: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20"
+                  orange: isDarkMode ? "bg-orange-500/10 text-orange-400 border-orange-500/20" : "bg-orange-500/5 text-orange-650 border-orange-500/20",
+                  cyan: isDarkMode ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" : "bg-cyan-500/5 text-cyan-650 border-cyan-500/20"
                 };
-                const colorClass = colors[tag.tone] || "bg-neutral-500/10 text-neutral-400 border-neutral-500/20";
+                const colorClass = colors[tag.tone] || (isDarkMode ? "bg-neutral-500/10 text-neutral-400 border-neutral-500/20" : "bg-neutral-500/5 text-neutral-600 border-neutral-500/20");
                 return (
                   <span key={idx} className={`text-[10px] font-bold px-3 py-1.5 border rounded-full ${colorClass}`}>
                     {tag.label}
@@ -538,21 +581,27 @@ export default function App() {
             <div className="mt-4 flex gap-2">
               <button
                 onClick={() => setIsEditingProfile(true)}
-                className="inline-flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white bg-white/5 border border-white/5 px-3.5 py-1.5 rounded-full transition-all"
+                className={`inline-flex items-center gap-1.5 text-xs px-3.5 py-1.5 rounded-full transition-all border cursor-pointer select-none active:scale-95 ${
+                  isDarkMode 
+                    ? "text-neutral-400 hover:text-white bg-white/5 border-white/5" 
+                    : "text-neutral-600 hover:text-neutral-900 bg-black/5 border-black/5"
+                }`}
               >
                 <Edit2 className="w-3 h-3" />
                 <span>Rename Avatar</span>
               </button>
             </div>
-          </div>
-
-          {/* Premium Bento Stats Boxes */}
-          <div className="flex items-center gap-6 bg-neutral-900/40 backdrop-blur-xl border border-white/5 p-5 rounded-[2rem] shrink-0 relative overflow-hidden z-10 shadow-xl shadow-black/30">
+          </div>          {/* Premium Bento Stats Boxes */}
+          <div className={`flex items-center gap-6 backdrop-blur-xl p-5 rounded-[2rem] shrink-0 relative overflow-hidden z-10 transition-colors duration-300 ${
+            isDarkMode 
+              ? "bg-neutral-900/40 border-white/5 border shadow-xl shadow-black/30" 
+              : "bg-white/60 border-black/5 border shadow-md shadow-black/[0.02]"
+          }`}>
             <div className="relative flex items-center justify-center shrink-0 w-[80px] h-[80px]">
               {/* SVG Ring */}
-              <svg height="80" width="80" className="rotate-[-90deg] drop-shadow-[0_0_12px_rgba(236,72,153,0.35)]">
+              <svg height="80" width="80" className={`rotate-[-90deg] ${isDarkMode ? "drop-shadow-[0_0_12px_rgba(236,72,153,0.35)]" : ""}`}>
                 <circle
-                  stroke="rgba(255,255,255,0.03)"
+                  stroke={isDarkMode ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.05)"}
                   fill="transparent"
                   strokeWidth={strokeWidth}
                   r={normalizedRadius}
@@ -580,27 +629,27 @@ export default function App() {
                 </defs>
               </svg>
               <div className="absolute text-center flex flex-col justify-center items-center">
-                <span className="text-[15px] font-black text-white font-mono leading-none">{completionPercentage}%</span>
-                <span className="text-[6px] text-neutral-500 font-mono uppercase tracking-widest mt-0.5 font-bold">Done</span>
+                <span className={`text-[15px] font-black font-mono leading-none ${isDarkMode ? "text-white" : "text-neutral-900"}`}>{completionPercentage}%</span>
+                <span className="text-[6px] text-neutral-550 font-mono uppercase tracking-widest mt-0.5 font-bold">Done</span>
               </div>
             </div>
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center gap-2">
                 <div className="bg-pink-500/10 p-1.5 rounded-lg border border-pink-500/10">
-                  <Flame className="w-3.5 h-3.5 text-pink-500 fill-pink-500/10 glow-pink animate-pulse" />
+                  <Flame className={`w-3.5 h-3.5 text-pink-500 fill-pink-500/10 animate-pulse ${isDarkMode ? "glow-pink" : ""}`} />
                 </div>
                 <div className="text-left">
-                  <p className="text-[8px] font-mono font-bold text-neutral-500 uppercase tracking-widest leading-none">STREAK</p>
-                  <p className="text-sm font-black text-white leading-none mt-0.5">{currentUser?.streak || 0} Days</p>
+                  <p className="text-[8px] font-mono font-bold text-neutral-550 uppercase tracking-widest leading-none">STREAK</p>
+                  <p className={`text-sm font-black leading-none mt-0.5 ${isDarkMode ? "text-white" : "text-neutral-900"}`}>{currentUser?.streak || 0} Days</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <div className="bg-lime-500/10 p-1.5 rounded-lg border border-lime-500/10">
-                  <Award className="w-3.5 h-3.5 text-lime-500 glow-lime" />
+                  <Award className={`w-3.5 h-3.5 text-lime-500 ${isDarkMode ? "glow-lime" : ""}`} />
                 </div>
                 <div className="text-left">
-                  <p className="text-[8px] font-mono font-bold text-neutral-500 uppercase tracking-widest leading-none">LOGS</p>
-                  <p className="text-sm font-black text-white leading-none mt-0.5">{currentUser?.totalWorkouts || 0} Sessions</p>
+                  <p className="text-[8px] font-mono font-bold text-neutral-550 uppercase tracking-widest leading-none">LOGS</p>
+                  <p className={`text-sm font-black leading-none mt-0.5 ${isDarkMode ? "text-white" : "text-neutral-900"}`}>{currentUser?.totalWorkouts || 0} Sessions</p>
                 </div>
               </div>
             </div>
@@ -612,11 +661,13 @@ export default function App() {
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 relative z-10">
         
         {/* Weekly Split Matrix Indicator HUD */}
-        <section className="liquid-glass rounded-[2rem] p-6 mb-8 flex flex-col gap-5 shadow-xl">
-          <div className="flex justify-between items-center border-b border-white/5 pb-3">
+        <section className={`rounded-[2rem] p-6 mb-8 flex flex-col gap-5 shadow-xl transition-colors duration-300 ${
+          isDarkMode ? "liquid-glass" : "light-glass"
+        }`}>
+          <div className={`flex justify-between items-center border-b pb-3 ${isDarkMode ? "border-white/5" : "border-black/5"}`}>
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-pink-500 glow-pink" />
-              <h3 className="text-xs font-mono font-extrabold text-white tracking-widest uppercase">7-Day Consistency Index</h3>
+              <Calendar className={`w-4 h-4 text-pink-500 ${isDarkMode ? "glow-pink" : ""}`} />
+              <h3 className={`text-xs font-mono font-extrabold tracking-widest uppercase ${isDarkMode ? "text-white" : "text-neutral-900"}`}>7-Day Consistency Index</h3>
             </div>
             <span className="text-[10px] text-neutral-500 font-mono font-semibold">7D rolling basis</span>
           </div>
@@ -629,12 +680,12 @@ export default function App() {
                   key={day.dayIndex}
                   className={`p-4 rounded-2xl flex flex-col gap-1 text-center transition-all ${
                     completed
-                      ? "bg-pink-500/5 border border-pink-500/20 text-pink-400"
-                      : "bg-neutral-950/40 border border-white/5 text-neutral-450"
+                      ? (isDarkMode ? "bg-pink-500/5 border border-pink-500/20 text-pink-400" : "bg-pink-500/[0.04] border border-pink-500/30 text-pink-600")
+                      : (isDarkMode ? "bg-neutral-950/40 border border-white/5 text-neutral-450" : "bg-black/[0.02] border border-black/5 text-neutral-550")
                   }`}
                 >
-                  <span className="text-[10px] font-mono text-neutral-500 leading-none">{day.dayName}</span>
-                  <span className="text-xs font-bold text-white uppercase mt-1 truncate">{day.title.split("&")[0]}</span>
+                  <span className="text-[10px] font-mono text-neutral-550 leading-none">{day.dayName}</span>
+                  <span className={`text-xs font-bold uppercase mt-1 truncate ${isDarkMode ? "text-white" : "text-neutral-850"}`}>{day.title.split("&")[0]}</span>
                   {completed ? (
                     <span className="flex items-center justify-center gap-1 text-[9px] font-mono text-pink-400 font-bold mt-1 bg-pink-500/10 py-0.5 rounded-lg uppercase">
                       <Check className="w-3 h-3" /> SECURED
@@ -644,7 +695,7 @@ export default function App() {
                   )}
                 </div>
               );
-            })}
+            })})}
           </div>
         </section>
 
@@ -691,7 +742,9 @@ export default function App() {
               className="flex flex-col gap-6"
             >
               {/* Category Filter Pills - Swipeable Chip Group */}
-              <div className="flex overflow-x-auto whitespace-nowrap pb-3 border-b border-white/5 gap-2.5 scrollbar-none snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0">
+              <div className={`flex overflow-x-auto whitespace-nowrap pb-3 border-b gap-2.5 scrollbar-none snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0 ${
+                isDarkMode ? "border-white/5" : "border-black/5"
+              }`}>
                 {["All Workouts", "Back & Lats", "Shoulders", "Chest & Abs", "Legs"].map((cat) => {
                   const isActive = activeCategory === cat || (cat === "All Workouts" && activeCategory === "All");
                   return (
@@ -736,42 +789,58 @@ export default function App() {
                   return (
                     <div
                       key={workout.dayIndex}
-                      className={`liquid-glass-interactive rounded-[2rem] p-6 flex flex-col justify-between relative overflow-hidden group shadow-lg ${accentClass}`}
+                      className={`rounded-[2rem] p-6 flex flex-col justify-between relative overflow-hidden group shadow-lg transition-colors duration-300 ${
+                        isDarkMode ? "liquid-glass-interactive" : "light-glass-interactive"
+                      } ${accentClass}`}
                       id={`day-workout-${workout.dayIndex}`}
                     >
                       <div>
                         {/* Badge bar */}
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center gap-2">
-                            <span className="px-3 py-1 bg-white/5 border border-white/10 text-white rounded-lg text-xs font-mono font-bold uppercase tracking-wider">
+                            <span className={`px-3 py-1 border rounded-lg text-xs font-mono font-bold uppercase tracking-wider ${
+                              isDarkMode ? "bg-white/5 border-white/10 text-white" : "bg-black/5 border-black/10 text-neutral-800"
+                            }`}>
                               {workout.dayName}
                             </span>
-                            <span className="px-2.5 py-0.5 text-[10px] bg-white/5 text-neutral-350 border border-white/5 font-mono rounded-full font-bold">
+                            <span className={`px-2.5 py-0.5 text-[10px] border font-mono rounded-full font-bold ${
+                              isDarkMode ? "bg-white/5 border-white/5 text-neutral-350" : "bg-black/3 border-black/5 text-neutral-600"
+                            }`}>
                               ⏱️ {estimatedDuration} min
                             </span>
-                            <span className="px-2.5 py-0.5 text-[10px] bg-white/5 text-neutral-350 border border-white/5 font-mono rounded-full font-bold">
+                            <span className={`px-2.5 py-0.5 text-[10px] border font-mono rounded-full font-bold ${
+                              isDarkMode ? "bg-white/5 border-white/5 text-neutral-350" : "bg-black/3 border-black/5 text-neutral-600"
+                            }`}>
                               {difficulty}
                             </span>
                           </div>
                           {isCompleted && (
-                            <span className="flex items-center gap-1.5 text-xs text-lime-400 bg-lime-500/5 px-2.5 py-0.5 font-semibold rounded-full border border-lime-500/10 font-mono tracking-wider uppercase">
-                              <Check className="w-3.5 h-3.5 glow-lime" /> SECURED
+                            <span className={`flex items-center gap-1.5 text-xs text-lime-650 bg-lime-500/5 px-2.5 py-0.5 font-semibold rounded-full border border-lime-500/10 font-mono tracking-wider uppercase ${isDarkMode ? "text-lime-400 border-lime-500/10" : "text-emerald-700 border-emerald-500/20 bg-emerald-50"}`}>
+                              <Check className={`w-3.5 h-3.5 ${isDarkMode ? "glow-lime" : ""}`} /> SECURED
                             </span>
                           )}
                         </div>
 
                         {/* Header core */}
-                        <h3 className="text-lg font-extrabold text-white uppercase tracking-tight leading-tight mb-2.5">
+                        <h3 className={`text-lg font-extrabold uppercase tracking-tight leading-tight mb-2.5 ${
+                          isDarkMode ? "text-white" : "text-neutral-900"
+                        }`}>
                           {workout.title}
                         </h3>
 
                         {/* V-Taper Focus Bar */}
-                        <div className="bg-white/2 border border-white/5 rounded-2xl p-3 mb-4 mt-2">
-                          <div className="flex justify-between items-center text-[10px] font-mono font-bold uppercase text-neutral-400">
+                        <div className={`border rounded-2xl p-3 mb-4 mt-2 ${
+                          isDarkMode ? "bg-white/2 border-white/5" : "bg-black/[0.02] border-black/5"
+                        }`}>
+                          <div className={`flex justify-between items-center text-[10px] font-mono font-bold uppercase ${
+                            isDarkMode ? "text-neutral-400" : "text-neutral-550"
+                          }`}>
                             <span>V-Taper Focus Density</span>
-                            <span className="text-pink-400">{vTaperPct}%</span>
+                            <span className="text-pink-505 font-extrabold">{vTaperPct}%</span>
                           </div>
-                          <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden mt-1.5">
+                          <div className={`w-full rounded-full h-1.5 overflow-hidden mt-1.5 ${
+                            isDarkMode ? "bg-white/5" : "bg-black/5"
+                          }`}>
                             <div
                               className="bg-gradient-to-r from-pink-500 to-rose-500 h-full rounded-full transition-all duration-500"
                               style={{ width: `${vTaperPct}%` }}
@@ -780,11 +849,15 @@ export default function App() {
                         </div>
 
                         {/* Targeted muscles tags */}
-                        <div className="flex flex-wrap gap-1.5 mb-4 border-t border-white/5 pt-3.5">
+                        <div className={`flex flex-wrap gap-1.5 mb-4 border-t pt-3.5 ${
+                          isDarkMode ? "border-white/5" : "border-black/5"
+                        }`}>
                           {workout.focus.map((tgt, i) => (
                             <span
                               key={i}
-                              className="bg-white/3 border border-white/5 text-neutral-400 text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-lg"
+                              className={`border text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-lg ${
+                                isDarkMode ? "bg-white/3 border-white/5 text-neutral-400" : "bg-black/3 border-black/5 text-neutral-600"
+                              }`}
                             >
                               {tgt}
                             </span>
@@ -799,19 +872,29 @@ export default function App() {
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            className="overflow-hidden border-t border-white/5 pt-4 mt-1 flex flex-col gap-2"
+                            className={`overflow-hidden border-t pt-4 mt-1 flex flex-col gap-2 ${
+                              isDarkMode ? "border-white/5" : "border-black/5"
+                            }`}
                           >
-                            <h4 className="text-[10px] font-mono font-bold text-neutral-400 uppercase tracking-widest mb-1">Movements Panel ({workout.exercises.length})</h4>
+                            <h4 className={`text-[10px] font-mono font-bold uppercase tracking-widest mb-1 ${
+                              isDarkMode ? "text-neutral-400" : "text-neutral-650"
+                            }`}>Movements Panel ({workout.exercises.length})</h4>
                             <div className="flex flex-col gap-2 max-h-60 overflow-y-auto pr-1">
                               {workout.exercises.map((ex) => (
-                                <div key={ex.id} className="flex items-center justify-between bg-white/2 border border-white/5 p-2.5 rounded-xl hover:bg-white/5 transition-all">
+                                <div key={ex.id} className={`flex items-center justify-between p-2.5 rounded-xl border transition-all ${
+                                  isDarkMode ? "bg-white/2 border-white/5 hover:bg-white/5" : "bg-black/[0.02] border-black/5 hover:bg-black/[0.04]"
+                                }`}>
                                   <div className="text-left flex-1 min-w-0">
-                                    <p className="text-xs font-bold text-white truncate">{ex.name}</p>
-                                    <p className="text-[9.5px] text-neutral-400 font-mono mt-0.5">{ex.sets} Sets × {ex.repsRange} | ⏱️ {ex.rest}</p>
+                                    <p className={`text-xs font-bold truncate ${isDarkMode ? "text-white" : "text-neutral-900"}`}>{ex.name}</p>
+                                    <p className={`text-[9.5px] font-mono mt-0.5 ${isDarkMode ? "text-neutral-450" : "text-neutral-600"}`}>{ex.sets} Sets × {ex.repsRange} | ⏱️ {ex.rest}</p>
                                   </div>
                                   <button
                                     onClick={() => setSelectedGuide(ex)}
-                                    className="p-1.5 bg-white/5 border border-white/5 hover:border-pink-500/30 text-neutral-400 hover:text-pink-400 rounded-lg transition-all"
+                                    className={`p-1.5 border rounded-lg transition-all cursor-pointer ${
+                                      isDarkMode 
+                                        ? "bg-white/5 border-white/5 hover:border-pink-500/30 text-neutral-400 hover:text-pink-400" 
+                                        : "bg-black/5 border-black/10 hover:border-pink-500/30 text-neutral-600 hover:text-pink-500"
+                                    }`}
                                     title="View Form Guide"
                                   >
                                     <Info className="w-3.5 h-3.5" />
@@ -824,7 +907,9 @@ export default function App() {
                       </AnimatePresence>
 
                       {/* Interaction Launch Buttons */}
-                      <div className="flex items-center gap-3 border-t border-white/5 pt-4 mt-3">
+                      <div className={`flex items-center gap-3 border-t pt-4 mt-3 ${
+                        isDarkMode ? "border-white/5" : "border-black/5"
+                      }`}>
                         <button
                           onClick={() => {
                             setExpandedRoutineIndex(isExpanded ? null : workout.dayIndex);
@@ -865,7 +950,7 @@ export default function App() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <HistoryLogs logs={workoutLogs} onDeleteLog={handleDeleteLog} />
+              <HistoryLogs logs={workoutLogs} onDeleteLog={handleDeleteLog} isDarkMode={isDarkMode} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -874,24 +959,32 @@ export default function App() {
       {/* --- EXERCISE GUIDE FLOATING WINDOWS --- */}
       <AnimatePresence>
         {selectedGuide && (
-          <ExerciseDetailModal exercise={selectedGuide} onClose={() => setSelectedGuide(null)} />
+          <ExerciseDetailModal exercise={selectedGuide} onClose={() => setSelectedGuide(null)} isDarkMode={isDarkMode} />
         )}
       </AnimatePresence>
 
       {/* --- RENAME PROFILE DIALOGUE --- */}
       <AnimatePresence>
         {isEditingProfile && currentUser && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md" id="edit-profile-modal">
+          <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md transition-colors duration-350 ${
+            isDarkMode ? "bg-black/85" : "bg-black/40"
+          }`} id="edit-profile-modal">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-sm liquid-glass rounded-[2rem] overflow-hidden shadow-2xl p-6 relative"
+              className={`w-full max-w-sm rounded-[2rem] overflow-hidden shadow-2xl p-6 relative transition-colors duration-300 ${
+                isDarkMode ? "liquid-glass" : "light-glass"
+              }`}
             >
-              <h3 className="text-base font-extrabold text-white font-sans uppercase tracking-wider mb-2">
+              <h3 className={`text-base font-extrabold font-sans uppercase tracking-wider mb-2 ${
+                isDarkMode ? "text-white" : "text-neutral-900"
+              }`}>
                 Customize Avatar Sign
               </h3>
-              <p className="text-xs text-neutral-400 mb-4 leading-relaxed font-medium">
+              <p className={`text-xs mb-4 leading-relaxed font-medium ${
+                isDarkMode ? "text-neutral-450" : "text-neutral-600"
+              }`}>
                 Provide your custom training handle. This will persist on-screen across logs.
               </p>
 
@@ -901,7 +994,9 @@ export default function App() {
                 onChange={(e) => setEditNameInput(e.target.value)}
                 maxLength={20}
                 placeholder="Name your Gym - Gemini"
-                className="w-full bg-white/3 border border-white/5 rounded-xl px-4 py-3 text-sm text-white font-bold select-none focus:outline-none focus:border-pink-500/80 mb-4 transition-colors font-sans"
+                className={`w-full border rounded-xl px-4 py-3 text-sm font-bold select-none focus:outline-none focus:border-pink-500/80 mb-4 transition-colors font-sans ${
+                  isDarkMode ? "bg-white/3 border-white/5 text-white" : "bg-black/3 border-black/10 text-neutral-800"
+                }`}
               />
 
               <div className="flex justify-end gap-2.5">
@@ -911,14 +1006,18 @@ export default function App() {
                     setEditNameInput(currentUser.displayName);
                     setIsEditingProfile(false);
                   }}
-                  className="px-4 py-2.5 bg-transparent hover:bg-white/5 border border-white/10 font-bold text-xs uppercase rounded-xl text-neutral-400 hover:text-white"
+                  className={`px-4 py-2.5 bg-transparent font-bold text-xs uppercase rounded-xl transition-all ${
+                    isDarkMode 
+                      ? "hover:bg-white/5 border-white/10 text-neutral-450 hover:text-white" 
+                      : "hover:bg-black/5 border-black/15 text-neutral-650 hover:text-neutral-900"
+                  }`}
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleSaveProfile}
-                  className="px-5 py-2.5 btn-liquid-pink font-extrabold text-xs uppercase text-white rounded-xl active:scale-95 transition-all"
+                  className="px-5 py-2.5 btn-liquid-pink font-extrabold text-xs uppercase text-white rounded-xl active:scale-95 transition-all cursor-pointer"
                 >
                   Secure Name
                 </button>
@@ -931,39 +1030,49 @@ export default function App() {
       {/* --- SUCCESS CELEBRATION OVERLAY --- */}
       <AnimatePresence>
         {celebratedLog && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md" id="workout-celebration">
+          <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md transition-colors duration-350 ${
+            isDarkMode ? "bg-black/90" : "bg-black/40"
+          }`} id="workout-celebration">
             <motion.div
               initial={{ opacity: 0, y: 50, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 50, scale: 0.9 }}
               transition={{ type: "spring", damping: 15 }}
-              className="w-full max-w-md bg-neutral-950 border border-white/5 rounded-[2.5rem] p-6 text-center shadow-3xl relative"
+              className={`w-full max-w-md border rounded-[2.5rem] p-6 text-center shadow-3xl relative transition-colors duration-300 ${
+                isDarkMode ? "bg-neutral-950 border-white/5" : "bg-white border-black/5"
+              }`}
             >
-              <div className="w-16 h-16 bg-pink-500/10 border-2 border-pink-500/30 text-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce glow-pink">
+              <div className={`w-16 h-16 bg-pink-500/10 border-2 border-pink-500/30 text-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce ${isDarkMode ? "glow-pink" : ""}`}>
                 <Trophy className="w-8 h-8" />
               </div>
 
-              <span className="text-[10px] font-mono font-bold text-pink-400 tracking-widest uppercase">
+              <span className="text-[10px] font-mono font-bold text-pink-500 tracking-widest uppercase">
                 SESSION RECORDED
               </span>
-              <h3 className="text-xl font-black text-white uppercase tracking-tight mt-1">
+              <h3 className={`text-xl font-black uppercase tracking-tight mt-1 ${
+                isDarkMode ? "text-white" : "text-neutral-900"
+              }`}>
                 EXCELLENT LIFTING!
               </h3>
-              <p className="text-xs text-neutral-400 max-w-sm mx-auto mt-2 leading-relaxed">
-                Your split entry for <span className="text-white font-bold font-mono">{celebratedLog.workoutName}</span> has been signed into your logs. Keep your spine erect and posture aligned.
+              <p className={`text-xs max-w-sm mx-auto mt-2 leading-relaxed ${
+                isDarkMode ? "text-neutral-450" : "text-neutral-600"
+              }`}>
+                Your split entry for <span className={`font-bold font-mono ${isDarkMode ? "text-white" : "text-neutral-850"}`}>{celebratedLog.workoutName}</span> has been signed into your logs. Keep your spine erect and posture aligned.
               </p>
 
               {/* Workout stats HUD */}
-              <div className="grid grid-cols-2 gap-3 bg-neutral-900 border border-white/5 p-4 rounded-2xl my-5 text-left">
+              <div className={`grid grid-cols-2 gap-3 border p-4 rounded-2xl my-5 text-left ${
+                isDarkMode ? "bg-neutral-900 border-white/5" : "bg-black/[0.02] border-black/5"
+              }`}>
                 <div>
-                  <span className="text-[9px] font-mono text-neutral-500 uppercase leading-none block font-bold">Time Under Tension</span>
-                  <span className="text-sm font-bold font-mono text-white mt-1 block">
+                  <span className="text-[9px] font-mono text-neutral-505 uppercase leading-none block font-bold">Time Under Tension</span>
+                  <span className={`text-sm font-bold font-mono mt-1 block ${isDarkMode ? "text-white" : "text-neutral-850"}`}>
                     {Math.floor(celebratedLog.duration / 60)} mins
                   </span>
                 </div>
                 <div>
-                  <span className="text-[9px] font-mono text-neutral-500 uppercase leading-none block font-bold">Sets Checked</span>
-                  <span className="text-sm font-bold font-mono text-white mt-1 block">
+                  <span className="text-[9px] font-mono text-neutral-505 uppercase leading-none block font-bold">Sets Checked</span>
+                  <span className={`text-sm font-bold font-mono mt-1 block ${isDarkMode ? "text-white" : "text-neutral-850"}`}>
                     {celebratedLog.exercises.flatMap(e => e.sets).length} sets
                   </span>
                 </div>
