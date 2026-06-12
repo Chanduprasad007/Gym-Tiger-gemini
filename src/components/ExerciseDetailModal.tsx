@@ -38,27 +38,29 @@ export default function ExerciseDetailModal({ exercise, onClose }: ExerciseDetai
   }, [exercise]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md" id="exercise-guide-modal">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md" id="exercise-guide-modal">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden shadow-2xl flex flex-col"
+        className="w-full max-w-lg liquid-glass-premium rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col max-h-[85vh] border border-white/5"
       >
         {/* Modal Header */}
-        <div className="bg-gradient-to-r from-neutral-950 to-neutral-900 px-6 py-4 border-b border-neutral-800 flex items-center justify-between shrink-0">
+        <div className="bg-white/3 px-6 py-5 border-b border-white/5 flex items-center justify-between shrink-0">
           <div>
-            <span className="text-[10px] font-mono bg-orange-500/10 text-orange-400 border border-orange-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
-              {exercise.category} Isolation
-            </span>
-            <span className="ml-1.5 text-[10px] font-mono bg-neutral-950 text-neutral-400 border border-neutral-850 px-2 py-0.5 rounded-full inline-block">
-              ⏱️ {exercise.rest} Rest
-            </span>
-            <h2 className="text-lg font-extrabold text-white mt-1 uppercase tracking-tight">{exercise.name}</h2>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-[9px] font-mono font-black bg-pink-500/10 text-pink-400 border border-pink-500/20 px-2.5 py-0.5 rounded-full uppercase tracking-wider glow-pink">
+                {exercise.category} Isolation
+              </span>
+              <span className="text-[9px] font-mono font-bold bg-white/5 text-neutral-300 border border-white/5 px-2.5 py-0.5 rounded-full inline-block">
+                ⏱️ {exercise.rest} Rest
+              </span>
+            </div>
+            <h2 className="text-base sm:text-lg font-black text-white mt-2 uppercase tracking-tight">{exercise.name}</h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-neutral-400 hover:text-white bg-neutral-800/40 hover:bg-neutral-800/80 transition-all border border-neutral-850 rounded-xl"
+            className="p-2 text-neutral-400 hover:text-white bg-white/3 hover:bg-white/5 border border-white/5 rounded-xl transition-all cursor-pointer"
             title="Close Guide"
           >
             <X className="w-4 h-4" />
@@ -69,18 +71,18 @@ export default function ExerciseDetailModal({ exercise, onClose }: ExerciseDetai
         <div className="p-6 flex flex-col gap-5 overflow-y-auto max-h-[75vh]">
           {/* Workout GIF Animation HUD */}
           <div className="flex flex-col gap-2">
-            <span className="text-[10px] font-mono font-bold text-neutral-400 uppercase tracking-widest flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-orange-505 animate-pulse" />
+            <span className="text-[9px] font-mono font-black text-neutral-400 uppercase tracking-widest flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-pink-500 animate-pulse glow-pink" />
               <span>LIVE SYSTEM LOG: ANIMATION DEMO</span>
             </span>
             
             {loading ? (
-              <div className="aspect-video w-full rounded-xl bg-neutral-950 border border-neutral-850 flex flex-col items-center justify-center gap-3">
-                <div className="w-7 h-7 rounded-full border-2 border-orange-550 border-t-transparent animate-spin" />
-                <p className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">Acquiring WorkoutX stream...</p>
+              <div className="aspect-video w-full rounded-2xl bg-black/40 border border-white/5 flex flex-col items-center justify-center gap-3 min-h-[140px]">
+                <div className="w-7 h-7 rounded-full border-2 border-pink-500 border-t-transparent animate-spin" />
+                <p className="text-[9px] font-mono text-neutral-500 uppercase tracking-wider font-bold">Acquiring WorkoutX stream...</p>
               </div>
             ) : extra?.gifUrl && !mediaErr ? (
-              <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-neutral-950 border border-neutral-850 flex items-center justify-center p-2 group shadow-inner">
+              <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black/40 border border-white/5 flex items-center justify-center p-2 group shadow-inner min-h-[140px]">
                 <img
                   src={extra.gifUrl}
                   alt={exercise.name}
@@ -89,17 +91,17 @@ export default function ExerciseDetailModal({ exercise, onClose }: ExerciseDetai
                   loading="lazy"
                   onError={() => setMediaErr(true)}
                 />
-                <span className="absolute bottom-2.5 right-2.5 text-[8px] font-mono font-medium text-emerald-400 bg-emerald-950/80 border border-emerald-500/20 px-2 py-0.5 rounded uppercase tracking-wider animate-pulse">
+                <span className="absolute bottom-2.5 right-2.5 text-[8px] font-mono font-black text-pink-400 bg-pink-500/10 border border-pink-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse glow-pink">
                   STREAM LIVE OK
                 </span>
               </div>
             ) : (
-              <div className="aspect-video w-full rounded-xl bg-neutral-950 border border-neutral-850 flex flex-col items-center justify-center gap-2 p-5 text-center">
-                <div className="w-11 h-11 rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 mb-1 animate-pulse">
-                  <Target className="w-5 h-5" />
+              <div className="aspect-video w-full rounded-2xl bg-black/45 border border-white/5 flex flex-col items-center justify-center gap-2 p-5 text-center min-h-[140px]">
+                <div className="w-10 h-10 rounded-full bg-pink-500/15 border border-pink-500/25 flex items-center justify-center text-pink-500 mb-1 animate-pulse shadow-[0_0_12px_rgba(236,72,153,0.15)]">
+                  <Target className="w-5 h-5 glow-pink" />
                 </div>
-                <span className="text-xs text-neutral-200 font-extrabold uppercase tracking-tight">Active Target: {exercise.target}</span>
-                <p className="text-[10.5px] text-neutral-400 max-w-sm leading-relaxed">
+                <span className="text-xs text-neutral-200 font-black uppercase tracking-tight">Active Target: {exercise.target}</span>
+                <p className="text-[10px] text-neutral-400 max-w-sm leading-relaxed">
                   The animated stream is currently offline. Refer to the <span className="text-white font-bold leading-none">Execution Protocol</span> below and tap the Google Search link for instant form guides.
                 </p>
               </div>
@@ -107,37 +109,37 @@ export default function ExerciseDetailModal({ exercise, onClose }: ExerciseDetai
           </div>
 
           {/* Target muscles banner */}
-          <div className="flex gap-3 items-center bg-neutral-950 border border-neutral-850 p-3.5 rounded-xl">
-            <Target className="w-5 h-5 text-orange-500 shrink-0" />
+          <div className="flex gap-3.5 items-center bg-white/3 border border-white/5 p-4 rounded-2xl">
+            <Target className="w-5 h-5 text-pink-500 shrink-0 glow-pink" />
             <div>
-              <p className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest leading-none">PRIMARY TARGET</p>
-              <p className="text-sm font-bold text-white mt-1 uppercase tracking-tight">{exercise.target}</p>
+              <p className="text-[9px] font-mono text-neutral-500 uppercase tracking-widest font-black leading-none">PRIMARY TARGET</p>
+              <p className="text-sm font-extrabold text-white mt-1 uppercase tracking-tight">{exercise.target}</p>
             </div>
           </div>
 
           {/* Form instructions */}
           <div>
-            <h4 className="text-xs font-mono font-bold text-neutral-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-              <Info className="w-3.5 h-3.5 text-orange-500" />
+            <h4 className="text-xs font-mono font-black text-neutral-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+              <Info className="w-3.5 h-3.5 text-pink-500 glow-pink" />
               <span>EXECUTION PROTOCOL</span>
             </h4>
             <ol className="flex flex-col gap-2.5">
               {exercise.instructions.map((step, idx) => (
                 <li key={idx} className="flex gap-3 text-sm text-neutral-300">
-                  <span className="w-5 h-5 rounded-full bg-neutral-950 text-neutral-300 font-mono text-[10px] flex items-center justify-center shrink-0 border border-neutral-850 font-semibold selection:bg-none">
+                  <span className="w-5 h-5 rounded-full bg-white/3 text-neutral-300 font-mono text-[9px] flex items-center justify-center shrink-0 border border-white/5 font-black">
                     {idx + 1}
                   </span>
-                  <p className="leading-relaxed text-sm">{step}</p>
+                  <p className="leading-relaxed text-xs sm:text-sm">{step}</p>
                 </li>
               ))}
             </ol>
           </div>
 
           {/* Tiger Tip for athletic form */}
-          <div className="bg-orange-500/5 border border-orange-500/15 p-4 rounded-xl flex gap-3.5 items-start">
-            <ShieldAlert className="w-5 h-5 text-orange-505 shrink-0 mt-0.5" />
+          <div className="bg-pink-500/5 border border-pink-500/15 p-4.5 rounded-2xl flex gap-3.5 items-start">
+            <ShieldAlert className="w-5 h-5 text-pink-500 shrink-0 mt-0.5 glow-pink" />
             <div>
-              <h5 className="text-xs font-bold text-orange-500 font-mono uppercase tracking-wider mb-1">
+              <h5 className="text-[10px] font-black text-pink-500 font-mono uppercase tracking-wider mb-1 glow-pink">
                 TIGER ALIGNMENT NOTE
               </h5>
               <p className="text-xs text-neutral-300 leading-relaxed font-sans mt-1">
@@ -148,23 +150,23 @@ export default function ExerciseDetailModal({ exercise, onClose }: ExerciseDetai
 
           {/* ALTERNATIVE EXERCISE SECTION */}
           {extra && extra.alternatives && (
-            <div className="border border-neutral-800/80 bg-neutral-950/60 p-4 rounded-xl flex flex-col gap-3">
-              <div className="flex items-center justify-between">
+            <div className="border border-white/5 bg-black/20 p-4.5 rounded-2xl flex flex-col gap-3.5">
+              <div className="flex items-center justify-between flex-wrap gap-2">
                 <div>
-                  <span className="text-[9px] font-mono text-orange-400 uppercase tracking-widest font-extrabold block">ALTERNATIVE DRILLS</span>
-                  <span className="text-[10px] text-neutral-400 font-mono mt-0.5">3 Drills Added</span>
+                  <span className="text-[9px] font-mono text-pink-400 uppercase tracking-widest font-black block glow-pink">ALTERNATIVE DRILLS</span>
+                  <span className="text-[10px] text-neutral-500 font-mono mt-0.5 uppercase font-bold">3 Drills Added</span>
                 </div>
                 
                 {/* 3 buttons to check them! */}
-                <div className="flex gap-1 bg-neutral-900 p-1 rounded-lg border border-neutral-800" id="alt-tabs-selector">
+                <div className="flex gap-0.5 bg-black/50 p-0.5 rounded-lg border border-white/5" id="alt-tabs-selector">
                   {[0, 1, 2].map((idx) => (
                     <button
                       key={idx}
                       onClick={() => setActiveAltIdx(idx)}
-                      className={`text-[10.5px] font-mono font-bold px-2.5 py-1 rounded-md transition-all select-none cursor-pointer ${
+                      className={`text-[9px] font-mono font-black px-2.5 py-1 rounded-md transition-all select-none cursor-pointer ${
                         activeAltIdx === idx
-                          ? "bg-orange-550 text-white shadow-sm"
-                          : "text-neutral-400 hover:text-white"
+                          ? "bg-pink-500 text-white shadow-[0_0_10px_rgba(236,72,153,0.3)]"
+                          : "text-neutral-450 hover:text-white"
                       }`}
                     >
                       Alt {idx + 1}
@@ -175,24 +177,24 @@ export default function ExerciseDetailModal({ exercise, onClose }: ExerciseDetai
 
               {/* Display currently selected alternative drill */}
               {extra.alternatives[activeAltIdx] && (
-                <div className="flex flex-col gap-2.5 pt-2 border-t border-neutral-800/50" key={activeAltIdx}>
-                  <div className="flex items-center justify-between">
-                    <h5 className="text-xs font-bold text-white uppercase tracking-tight">
+                <div className="flex flex-col gap-2.5 pt-3 border-t border-white/5" key={activeAltIdx}>
+                  <div className="flex items-center justify-between gap-2">
+                    <h5 className="text-[11px] font-black text-white uppercase tracking-tight truncate max-w-[150px]" title={extra.alternatives[activeAltIdx].name}>
                       {extra.alternatives[activeAltIdx].name}
                     </h5>
-                    <span className="text-[9px] font-mono font-semibold bg-orange-500/10 text-orange-400 border border-orange-500/20 px-2 py-0.5 rounded-md">
+                    <span className="text-[8px] font-mono font-black bg-pink-500/10 text-pink-400 border border-pink-500/20 px-2 py-0.5 rounded-full uppercase shrink-0 glow-pink">
                       {extra.alternatives[activeAltIdx].target}
                     </span>
                   </div>
 
-                  <p className="text-xs text-neutral-400 leading-relaxed italic">
+                  <p className="text-[11px] text-neutral-400 leading-relaxed italic">
                     If the primary setup is busy or joints feel stiff, swap to this alternative drill with identical motor routing:
                   </p>
 
                   <ul className="flex flex-col gap-1.5 pl-1">
                     {extra.alternatives[activeAltIdx].instructions.map((altStep, altIdx) => (
                       <li key={altIdx} className="text-xs text-neutral-300 flex items-start gap-2">
-                        <span className="text-orange-500 text-xs font-extrabold select-none">•</span>
+                        <span className="text-pink-500 text-xs font-black select-none">•</span>
                         <span className="leading-relaxed">{altStep}</span>
                       </li>
                     ))}
@@ -207,18 +209,18 @@ export default function ExerciseDetailModal({ exercise, onClose }: ExerciseDetai
             href={extra?.googleSearchUrl || `https://www.google.com/search?q=${encodeURIComponent("how to do " + exercise.name + " barbell dumbbell cable execution video form")}`}
             target="_blank"
             rel="noreferrer"
-            className="flex items-center justify-center gap-2.5 w-full py-3 px-4 rounded-xl border border-neutral-800 hover:border-orange-500/40 hover:bg-orange-550/5 text-neutral-400 hover:text-white transition-all text-xs font-mono tracking-wider font-extrabold"
+            className="btn-liquid-pink flex items-center justify-center gap-2.5 w-full py-3.5 px-4 rounded-xl border border-white/10 text-white transition-all text-xs font-mono tracking-wider font-black cursor-pointer select-none"
           >
-            <Search className="w-4 h-4 text-orange-500 group-hover:scale-105 transition-transform" />
+            <Search className="w-4 h-4 text-white" />
             <span>SEE EXECUTION ON GOOGLE SEARCH</span>
           </a>
         </div>
 
         {/* Modal Footer */}
-        <div className="bg-neutral-950/60 border-t border-neutral-800/85 px-6 py-4 flex justify-end shrink-0">
+        <div className="bg-white/3 border-t border-white/5 px-6 py-4.5 flex justify-end shrink-0">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-600 hover:to-orange-400 text-white font-semibold text-sm rounded-xl transition-all shadow-md active:scale-98 select-none"
+            className="px-6 py-3.5 btn-liquid-pink text-white font-black text-xs sm:text-sm tracking-widest uppercase rounded-xl transition-all shadow-xl select-none cursor-pointer"
           >
             Got it, Let's Pull
           </button>

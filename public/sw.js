@@ -1,4 +1,4 @@
-// Gym Tiger PWA Service Worker for Offline Handling & Installability
+// Gym - Gemini PWA Service Worker for Offline Handling & Installability
 const CACHE_NAME = "gym-tiger-v1";
 const ASSETS_TO_CACHE = [
   "./",

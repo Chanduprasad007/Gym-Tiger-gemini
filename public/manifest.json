@@ -1,6 +1,6 @@
 {
-  "name": "Gym Tiger",
-  "short_name": "Gym Tiger",
+  "name": "Gym - Gemini",
+  "short_name": "Gym - Gemini",
   "description": "Elite Strength Split Tracker with WorkoutX assistance",
   "start_url": ".",
   "display": "standalone",

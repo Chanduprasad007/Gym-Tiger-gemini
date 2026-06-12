@@ -16,7 +16,7 @@ export interface ExerciseExtraInfo {
   googleSearchUrl: string;
 }
 
-// 24 Gym Tiger Exercises details with Curated Alternates & Fallback illustration search terms.
+// 24 Gym - Gemini Exercises details with Curated Alternates & Fallback illustration search terms.
 export const CURATED_EXTRAS: Record<
   string,
   {

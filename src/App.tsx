@@ -39,8 +39,10 @@ export default function App() {
   // Authentication & Guest State
   const [currentUser, setCurrentUser] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showAuthGate, setShowAuthGate] = useState(true);
+  const [showAuthGate, setShowAuthGate] = useState(false); // Default to false
   const [workoutLogs, setWorkoutLogs] = useState<WorkoutLog[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [expandedRoutineIndex, setExpandedRoutineIndex] = useState<number | null>(null);
 
   // Profile customization modal (for guests and members alike)
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -68,6 +70,38 @@ export default function App() {
   const normalizedRadius = radius - strokeWidth;
   const circumference = normalizedRadius * 2 * Math.PI;
   const strokeDashoffset = circumference - (completionPercentage / 100) * circumference;
+
+  // V-Taper focus calculation (Lat Width, Mid Back, Shoulders, Rear Delt, Traps)
+  const getVTaperIntensity = (workout: DayWorkout) => {
+    const vTaperTargets = ["Lat Width", "Mid Back", "Shoulders", "Rear Delt", "Traps"];
+    let vTaperSets = 0;
+    let totalSets = 0;
+    workout.exercises.forEach((ex) => {
+      totalSets += ex.sets;
+      if (vTaperTargets.includes(ex.target)) {
+        vTaperSets += ex.sets;
+      }
+    });
+    if (totalSets === 0) return 0;
+    return Math.round((vTaperSets / totalSets) * 100);
+  };
+
+  const filteredWorkouts = GYM_TIGER_SPLIT.filter((workout) => {
+    if (activeCategory === "All") return true;
+    if (activeCategory === "Back & Lats") {
+      return workout.focus.includes("Lat Width") || workout.focus.includes("Mid Back") || workout.focus.includes("Lower Back");
+    }
+    if (activeCategory === "Shoulders") {
+      return workout.focus.includes("Shoulders") || workout.focus.includes("Rear Delt") || workout.focus.includes("Traps");
+    }
+    if (activeCategory === "Chest & Abs") {
+      return workout.focus.includes("Chest") || workout.focus.includes("Core/Abs") || workout.focus.includes("Triceps");
+    }
+    if (activeCategory === "Legs") {
+      return workout.focus.includes("Legs");
+    }
+    return true;
+  });
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,7 +179,7 @@ export default function App() {
       console.error("Email registration failure: ", err);
       let clientMsg = "Registration failed. Ensure email is not already registered.";
       if (err.code === "auth/email-already-in-use") {
-        clientMsg = "This email is already linked to another Gym Tiger profile.";
+        clientMsg = "This email is already linked to another Gym - Gemini profile.";
       } else if (err.code === "auth/invalid-email") {
         clientMsg = "Invalid email address format.";
       } else if (err.code === "auth/weak-password") {
@@ -161,92 +195,10 @@ export default function App() {
 
   // Load initial local data (Guest fallback)
   useEffect(() => {
-    // Check if firebase Auth is setting up
-    if (isFirebaseAvailable && auth) {
-      const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-        setLoading(true);
-        if (firebaseUser) {
-          try {
-            // Get user document in Firestore
-            const userDocRef = doc(db, "users", firebaseUser.uid);
-            const userSnap = await getDoc(userDocRef);
-
-            let profileData: UserStats;
-            if (userSnap.exists()) {
-              const data = userSnap.data();
-              profileData = {
-                userId: firebaseUser.uid,
-                email: firebaseUser.email || "",
-                displayName: data.displayName || firebaseUser.displayName || "Tiger Fellow",
-                streak: data.streak || 0,
-                totalWorkouts: data.totalWorkouts || 0,
-                lastCompletedDate: data.lastCompletedDate || null,
-              };
-            } else {
-              // Create user profile
-              profileData = {
-                userId: firebaseUser.uid,
-                email: firebaseUser.email || "",
-                displayName: firebaseUser.displayName || "Tiger Fellow",
-                streak: 0,
-                totalWorkouts: 0,
-                lastCompletedDate: null,
-              };
-              await setDoc(userDocRef, {
-                ...profileData,
-                updatedAt: new Date().toISOString()
-              });
-            }
-
-            setCurrentUser(profileData);
-            setEditNameInput(profileData.displayName);
-            setShowAuthGate(false);
-
-            // Fetch logs from Firestore
-            const logsPath = `users/${firebaseUser.uid}/workouts`;
-            const querySnapshot = await getDocs(collection(db, logsPath));
-            const fetchedLogs: WorkoutLog[] = [];
-            querySnapshot.forEach((docSnap) => {
-              fetchedLogs.push(docSnap.data() as WorkoutLog);
-            });
-
-            // Sort logs descending by date
-            fetchedLogs.sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
-            setWorkoutLogs(fetchedLogs);
-          } catch (err) {
-            console.error("Firebase auth initial fetch error, sliding back to Guest storage", err);
-            const wasGuest = localStorage.getItem("gym_tiger_was_guest") === "true";
-            if (wasGuest) {
-              loadLocalStorageFallback();
-              setShowAuthGate(false);
-            } else {
-              setShowAuthGate(true);
-            }
-          }
-        } else {
-          // No user, check if we was guest
-          const wasGuest = localStorage.getItem("gym_tiger_was_guest") === "true";
-          if (wasGuest) {
-            loadLocalStorageFallback();
-            setShowAuthGate(false);
-          } else {
-            setShowAuthGate(true);
-          }
-        }
-        setLoading(false);
-      });
-      return () => unsubscribe();
-    } else {
-      // Local Guest fallback
-      const wasGuest = localStorage.getItem("gym_tiger_was_guest") === "true";
-      if (wasGuest) {
-        loadLocalStorageFallback();
-        setShowAuthGate(false);
-      } else {
-        setShowAuthGate(true);
-      }
-      setLoading(false);
-    }
+    setLoading(true);
+    loadLocalStorageFallback();
+    setShowAuthGate(false);
+    setLoading(false);
   }, []);
 
   const loadLocalStorageFallback = () => {
@@ -260,8 +212,8 @@ export default function App() {
     } else {
       const guestObj: UserStats = {
         userId: "guest_tiger",
-        email: "guest@gymtiger.local",
-        displayName: "Guest Tiger",
+        email: "guest@gymgemini.local",
+        displayName: "Athlete",
         streak: 0,
         totalWorkouts: 0,
         lastCompletedDate: null,
@@ -467,7 +419,7 @@ export default function App() {
             <Flame className="w-8 h-8 animate-pulse" />
           </div>
           <span className="text-xs text-orange-500 font-mono font-bold tracking-widest mt-2 uppercase">
-            Summoning Gym Tiger...
+            Summoning Gym - Gemini...
           </span>
         </div>
       </div>
@@ -480,6 +432,7 @@ export default function App() {
       <ActiveWorkout
         dayWorkout={activeWorkout}
         userId={currentUser?.userId || "guest_tiger"}
+        workoutLogs={workoutLogs}
         onFinish={handleFinishWorkout}
         onCancel={() => {
           if (confirm("Disconnect today's progression? All active sets weight/reps will be lost.")) {
@@ -493,197 +446,17 @@ export default function App() {
     );
   }
 
-  if (showAuthGate && (!currentUser || currentUser.userId === "guest_tiger")) {
-    return (
-      <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col justify-center items-center p-4 font-sans relative overflow-hidden" id="login-landing-gate">
-        {/* Background ambient aesthetic radial gradients */}
-        <div className="absolute top-[-10%] left-[-15%] w-[60vw] h-[60vw] max-w-[600px] bg-pink-500/10 rounded-full blur-[140px] animate-blob-1 pointer-events-none z-0" />
-        <div className="absolute bottom-[-10%] right-[-15%] w-[60vw] h-[60vw] max-w-[600px] bg-lime-500/10 rounded-full blur-[140px] animate-blob-2 pointer-events-none z-0" />
 
-        <div className="max-w-md w-full liquid-glass rounded-[2.5rem] p-6 sm:p-8 shadow-2xl relative z-10 text-center flex flex-col gap-6">
-          {/* Top Branding Section */}
-          <div className="flex flex-col items-center">
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="relative mb-4 cursor-pointer"
-            >
-              <div className="w-20 h-20 bg-gradient-to-br from-pink-500 via-rose-500 to-orange-500 rounded-[2rem] flex items-center justify-center text-black font-extrabold text-3.5xl tracking-tighter shadow-xl shadow-pink-500/15">
-                <Flame className="w-10 h-10 text-neutral-950 fill-neutral-950 animate-pulse" />
-              </div>
-              <span className="absolute -bottom-1 -right-1 bg-neutral-950 border border-white/10 text-[9px] text-pink-400 font-mono font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                V1.2
-              </span>
-            </motion.div>
 
-            <span className="text-[9px] font-mono font-black text-pink-400 uppercase tracking-widest bg-pink-500/10 px-3 py-1 rounded-full border border-pink-500/10 mb-2">
-              THE COLD HYPERTROPHY METHOD
-            </span>
-            <h1 className="text-3xl font-black text-white uppercase tracking-tighter leading-none">
-              GYM TIGER
-            </h1>
-            <p className="text-xs text-neutral-400 mt-2 font-medium max-w-sm leading-relaxed">
-              An elite training system engineered to address lateral lat depth, anti-rotation core raises, and spinal support carries.
-            </p>
-          </div>
-
-          {/* Premium Bullet Core Features Display */}
-          <div className="bg-neutral-950/40 border border-white/5 rounded-[2rem] p-5 text-left flex flex-col gap-4">
-            <div className="flex items-start gap-3">
-              <div className="bg-pink-500/10 text-pink-400 p-2 rounded-xl border border-pink-500/10 shrink-0 animate-pulse">
-                <Calendar className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="text-xs font-bold text-white uppercase tracking-wide">Six-Day Hypertrophy Matrix</h3>
-                <p className="text-[10px] text-neutral-400 mt-0.5 leading-relaxed">Custom training days focused on major structural hypertrophy zones.</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <div className="bg-lime-500/10 text-lime-400 p-2 rounded-xl border border-lime-500/10 shrink-0">
-                <Database className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="text-xs font-bold text-white uppercase tracking-wide">Secure Cloud Infrastructure</h3>
-                <p className="text-[10px] text-neutral-400 mt-0.5 leading-relaxed">Sync progression and historic logs across phone and computer.</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <div className="bg-cyan-500/10 text-cyan-400 p-2 rounded-xl border border-cyan-500/10 shrink-0">
-                <Sparkles className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="text-xs font-bold text-white uppercase tracking-wide">Form Video & Fallback Caches</h3>
-                <p className="text-[10px] text-neutral-400 mt-0.5 leading-relaxed">Search exercise formats and run offline cached content gracefully.</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Email / Password Sign In and Sign Up HUD Forms */}
-          <div className="flex flex-col gap-3.5 border-t border-b border-white/5 py-5 text-left">
-            <h2 className="text-[10px] font-mono font-black text-pink-400 uppercase tracking-widest text-center mb-1">
-              {isSignUp ? "CREATE A TIGER PROFILE" : "SIGN IN REGISTRATION"}
-            </h2>
-
-            <form onSubmit={isSignUp ? handleEmailSignUp : handleEmailLogin} className="flex flex-col gap-3">
-              {isSignUp && (
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[9px] font-mono font-bold text-neutral-500 uppercase tracking-wider">Full Name</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Arnold S."
-                    value={signUpNameInput}
-                    onChange={(e) => setSignUpNameInput(e.target.value)}
-                    className="bg-white/3 border border-white/5 focus:border-pink-500 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none transition-colors font-sans"
-                  />
-                </div>
-              )}
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[9px] font-mono font-bold text-neutral-500 uppercase tracking-wider">Email Address</label>
-                <input
-                  type="email"
-                  required
-                  placeholder="name@domain.com"
-                  value={emailInput}
-                  onChange={(e) => setEmailInput(e.target.value)}
-                  className="bg-white/3 border border-white/5 focus:border-pink-500 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none transition-colors font-sans"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[9px] font-mono font-bold text-neutral-500 uppercase tracking-wider">Secure Password</label>
-                <input
-                  type="password"
-                  required
-                  placeholder="Min. 6 characters"
-                  value={passwordInput}
-                  onChange={(e) => setPasswordInput(e.target.value)}
-                  className="bg-white/3 border border-white/5 focus:border-pink-500 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none transition-colors font-sans"
-                />
-              </div>
-
-              {authError && (
-                <div className="text-[9px] font-mono font-bold text-red-400 bg-red-950/20 border border-red-500/15 rounded-xl p-2.5 leading-relaxed text-center">
-                  {authError}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                className="w-full btn-liquid-pink text-white font-extrabold text-xs uppercase py-3 rounded-full shadow-lg transition-all active:scale-98 cursor-pointer text-center tracking-wider"
-              >
-                {isSignUp ? "Initiate Account" : "Access Secure Training"}
-              </button>
-            </form>
-
-            <button
-              type="button"
-              onClick={() => {
-                setIsSignUp(!isSignUp);
-                setAuthError("");
-              }}
-              className="text-[9px] font-mono font-black text-pink-400/80 hover:text-pink-300 uppercase tracking-wider text-center mt-1 focus:outline-none transition-all cursor-pointer"
-            >
-              {isSignUp ? "• Already Registered? Log In instead" : "• Need registration? Create an account"}
-            </button>
-          </div>
-
-          {/* Interactive Flow Entrance Buttons */}
-          <div className="flex flex-col gap-3">
-            <span className="text-[8px] font-mono text-neutral-500 uppercase tracking-widest">- OR ONE-CLICK CONNECT -</span>
-            <button
-              onClick={handleLogin}
-              className="w-full bg-white/5 hover:bg-white/10 border border-white/5 text-neutral-100 font-bold text-xs uppercase py-3 rounded-full transition-all cursor-pointer flex items-center justify-center gap-2"
-            >
-              <Database className="w-3.5 h-3.5 text-pink-500 fill-pink-500/10" />
-              <span>Connect Cloud with Google</span>
-            </button>
-
-            <button
-              onClick={handleProceedAsGuest}
-              className="w-full bg-transparent hover:bg-white/5 border border-white/10 text-neutral-400 hover:text-neutral-200 font-bold text-xs uppercase py-2.5 rounded-full transition-all cursor-pointer flex items-center justify-center gap-1.5"
-            >
-              <User className="w-3.5 h-3.5" />
-              <span>Proceed in Offline Guest Mode</span>
-            </button>
-          </div>
-
-          <div className="flex items-center justify-center gap-5 border-t border-white/5 pt-4 mt-2">
-            <div className="text-center">
-              <span className="text-[14px] font-mono font-black text-white">6</span>
-              <span className="text-[9px] font-mono text-neutral-500 block font-bold">SPLITS</span>
-            </div>
-            <div className="w-px h-6 bg-white/5" />
-            <div className="text-center">
-              <span className="text-[14px] font-mono font-black text-white">100%</span>
-              <span className="text-[9px] font-mono text-neutral-500 block font-bold">MOBILE ADAPTIVE</span>
-            </div>
-            <div className="w-px h-6 bg-white/5" />
-            <div className="text-center">
-              <span className="text-[14px] font-mono font-black text-white">PWA</span>
-              <span className="text-[9px] font-mono text-neutral-500 block font-bold">INSTALLABLE</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer brand disclaimer */}
-        <p className="text-[9px] text-neutral-600 uppercase tracking-widest font-mono mt-6 text-center select-none font-bold">
-          Gym Tiger Elite Training Environment • Cloud-Secured Access
-        </p>
-      </div>
-    );  return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-200 flex flex-col font-sans relative pb-12 overflow-hidden animate-fade-in" id="gym-tiger-root">
+  return (
+    <div className="min-h-screen bg-neutral-950 text-neutral-200 flex flex-col font-sans relative pb-12 overflow-hidden animate-fade-in" id="gym-gemini-root">
       {/* Background Animated Blobs */}
       <div className="absolute top-[-10%] left-[-15%] w-[60vw] h-[60vw] max-w-[600px] bg-pink-500/10 rounded-full blur-[140px] animate-blob-1 pointer-events-none z-0" />
       <div className="absolute bottom-[-10%] right-[-15%] w-[60vw] h-[60vw] max-w-[600px] bg-lime-500/10 rounded-full blur-[140px] animate-blob-2 pointer-events-none z-0" />
       <div className="absolute top-[30%] left-[50%] -translate-x-1/2 w-[50vw] h-[50vw] max-w-[500px] bg-cyan-500/8 rounded-full blur-[140px] animate-blob-3 pointer-events-none z-0" />
 
       {/* Dynamic Tiger HUD Bar */}
-      <nav className="sticky top-0 z-40 bg-neutral-950/45 backdrop-blur-xl border-b border-white/5 px-4 py-3.5 shadow-2xl shadow-black/10 select-none relative">
+      <nav className="sticky top-0 z-45 bg-[#050508]/80 backdrop-blur-xl border-b border-white/5 px-4 py-3.5 shadow-2xl shadow-black/10 select-none relative">
         <div className="max-w-6xl w-full mx-auto flex items-center justify-between relative z-10">
           {/* Logo brand */}
           <div className="flex items-center gap-2">
@@ -691,9 +464,9 @@ export default function App() {
               G
             </div>
             <h1 className="text-sm font-black font-sans uppercase tracking-widest text-white flex items-center gap-1.5 leading-none">
-              GYM TIGER
+              GYM - GEMINI
               <span className="text-[8px] bg-pink-500/15 text-pink-400 px-1.5 py-0.5 rounded border border-pink-500/10 font-mono font-semibold">
-                ELITE
+                STRENGTH
               </span>
             </h1>
           </div>
@@ -702,7 +475,7 @@ export default function App() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowGitHubGuide(true)}
-              className="px-3 py-1.5 bg-white/5 hover:bg-white/10 hover:text-white text-neutral-400 border border-white/5 rounded-xl flex items-center gap-1.5 transition-all active:scale-95 text-xs font-bold"
+              className="px-3 py-1.5 bg-white/3 hover:bg-white/7 hover:text-white text-neutral-400 border border-white/5 rounded-xl flex items-center gap-1.5 transition-all active:scale-95 text-xs font-bold"
               id="github-guide-trigger"
             >
               <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 16 16" version="1.1" aria-hidden="true">
@@ -711,63 +484,36 @@ export default function App() {
               <span className="hidden sm:inline">GitHub</span>
             </button>
 
-            {currentUser && currentUser.userId !== "guest_tiger" ? (
-              <div className="flex items-center gap-2 bg-white/5 border border-white/5 p-1 rounded-full pr-4">
-                <div className="w-6 h-6 rounded-full bg-pink-500 flex items-center justify-center text-black font-bold text-xs shadow shadow-pink-500/30">
-                  {currentUser.displayName.charAt(0).toUpperCase()}
-                </div>
-                <div className="hidden sm:block text-left">
-                  <p className="text-[10px] font-bold text-neutral-350 capitalize truncate max-w-24 leading-none">{currentUser.displayName}</p>
-                  <p className="text-[8px] text-pink-400 font-mono flex items-center gap-0.5 mt-0.5 leading-none font-bold">
-                    <Database className="w-2 h-2" /> CLOUD
-                  </p>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="p-1 text-neutral-500 hover:text-white rounded"
-                  title="Disconnect account"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                </button>
+            <div 
+              onClick={() => setIsEditingProfile(true)}
+              className="flex items-center gap-2 bg-white/3 border border-white/5 p-1 rounded-full pr-4 cursor-pointer hover:bg-white/5 hover:border-pink-500/30 transition-all select-none active:scale-98"
+            >
+              <div className="w-6 h-6 rounded-full bg-pink-500 flex items-center justify-center text-black font-extrabold text-xs shadow shadow-pink-500/30 uppercase animate-pulse">
+                {currentUser?.displayName?.charAt(0).toUpperCase() || "A"}
               </div>
-            ) : (
-              <div className="flex items-center gap-1.5">
-                {isFirebaseAvailable ? (
-                  <button
-                    onClick={handleLogin}
-                    className="text-xs btn-liquid-pink text-white font-extrabold px-3.5 py-2 rounded-full transition-all shadow-md active:scale-95 text-nowrap tracking-wider"
-                  >
-                    Sync Cloud
-                  </button>
-                ) : (
-                  <div className="flex items-center gap-1 text-[10px] bg-white/5 text-pink-400 border border-white/5 px-2.5 py-1.5 rounded-full font-mono font-bold">
-                    <Database className="w-3 h-3 text-pink-400/80" />
-                    <span>GUEST PLAY</span>
-                  </div>
-                )}
+              <div className="hidden sm:block text-left">
+                <p className="text-[10px] font-bold text-neutral-350 capitalize truncate max-w-24 leading-none">{currentUser?.displayName || "Athlete"}</p>
+                <p className="text-[7px] text-pink-400 font-mono flex items-center gap-0.5 mt-0.5 leading-none font-bold">
+                  LOCAL SESSION
+                </p>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </nav>
 
       {/* Hero Welcome Banner */}
-      <header className="px-4 py-12 relative z-10">
+      <header className="px-4 py-8 relative z-10">
         <div className="max-w-6xl w-full mx-auto flex flex-col md:flex-row md:items-center justify-between gap-8">
           <div className="flex-1">
-            <div className="flex items-center gap-2 text-pink-500 text-xs font-mono font-bold tracking-widest uppercase mb-2">
-              <Sparkles className="w-3.5 h-3.5 glow-pink" />
-              <span>THE COLD HYPERTROPHY METHOD</span>
-            </div>
-            <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight uppercase leading-none">
-              SHATTER YOUR SLOUCH. <br />
+            <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight uppercase leading-none animate-fade-in">
+              SCULPT THE <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-rose-500 to-orange-500 glow-pink">
-                FORTIFY THE POSTERIOR.
+                V-TAPER PHYSIQUE.
               </span>
             </h2>
-            <p className="text-xs text-neutral-400 max-w-xl mt-4 leading-relaxed font-sans font-medium">
-              Welcome back, <span className="text-white font-black">{currentUser?.displayName}</span>. 
-              Gym Tiger is an elite training engine delivering localized lateral lat width, chest width, anti-rotation core raises, and spinal support carries.
+            <p className="text-xs text-neutral-450 mt-3 max-w-xl font-mono uppercase tracking-wider font-extrabold glow-pink">
+              ⚡ Distraction-free hypertrophy & strength engine.
             </p>
             
             {/* focusTags visual badges */}
@@ -902,15 +648,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* V-Taper Coaching Rules blueprint corner */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {coachingRules.map((rule, idx) => (
-            <div key={idx} className="liquid-glass-interactive rounded-[2rem] p-5 shadow-lg flex flex-col gap-2.5">
-              <span className="text-[10px] font-mono font-black text-pink-500 uppercase tracking-wider glow-pink">{rule.title}</span>
-              <p className="text-xs text-neutral-400 leading-relaxed font-sans font-medium">{rule.copy}</p>
-            </div>
-          ))}
-        </section>
+
 
         {/* Tab switcher navigation bar */}
         <div className="flex border-b border-white/5 gap-6 mb-6">
@@ -950,96 +688,174 @@ export default function App() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="grid grid-cols-1 md:grid-cols-2 gap-5"
+              className="flex flex-col gap-6"
             >
-              {GYM_TIGER_SPLIT.map((workout) => {
-                const isCompleted = isDayCompletedThisWeek(workout.dayIndex);
-                
-                const accentColors: Record<string, string> = {
-                  orange: "hover:border-orange-500/25 shadow-orange-500/2",
-                  cyan: "hover:border-cyan-500/25 shadow-cyan-500/2",
-                  violet: "hover:border-violet-500/25 shadow-violet-500/2",
-                };
-                const accentClass = accentColors[workout.accent || "orange"] || "hover:border-pink-500/25";
+              {/* Category Filter Pills */}
+              <div className="flex flex-wrap gap-2 pb-3 border-b border-white/5">
+                {["All Workouts", "Back & Lats", "Shoulders", "Chest & Abs", "Legs"].map((cat) => {
+                  const isActive = activeCategory === cat || (cat === "All Workouts" && activeCategory === "All");
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => setActiveCategory(cat === "All Workouts" ? "All" : cat)}
+                      className={`px-4 py-2.5 rounded-xl text-xs font-mono font-black uppercase tracking-wider transition-all border ${
+                        isActive
+                          ? "bg-pink-500/10 text-pink-400 border-pink-500/40 glow-pink"
+                          : "bg-white/3 border-white/5 text-neutral-450 hover:text-white"
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  );
+                })}
+              </div>
 
-                const gradientBtns: Record<string, string> = {
-                  orange: "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 shadow-orange-500/20",
-                  cyan: "bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 shadow-cyan-500/20",
-                  violet: "bg-gradient-to-r from-fuchsia-500 to-violet-500 hover:from-fuchsia-600 hover:to-violet-600 shadow-violet-500/20"
-                };
-                const buttonClass = gradientBtns[workout.accent || "orange"] || "bg-gradient-to-r from-pink-500 to-rose-500 shadow-pink-500/20";
+              {/* Splits Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {filteredWorkouts.map((workout) => {
+                  const isCompleted = isDayCompletedThisWeek(workout.dayIndex);
+                  const isExpanded = expandedRoutineIndex === workout.dayIndex;
+                  const vTaperPct = getVTaperIntensity(workout);
+                  const estimatedDuration = workout.exercises.length * 8;
+                  const difficulty = workout.exercises.length > 8 ? "🔥 Elite" : "🔥 Intense";
+                  
+                  const accentColors: Record<string, string> = {
+                    orange: "hover:border-orange-500/25 shadow-orange-500/2",
+                    cyan: "hover:border-cyan-500/25 shadow-cyan-500/2",
+                    violet: "hover:border-violet-500/25 shadow-violet-500/2",
+                  };
+                  const accentClass = accentColors[workout.accent || "orange"] || "hover:border-pink-500/25";
 
-                return (
-                  <div
-                    key={workout.dayIndex}
-                    className={`liquid-glass-interactive rounded-[2rem] p-6 flex flex-col justify-between relative overflow-hidden group shadow-lg ${accentClass}`}
-                    id={`day-workout-${workout.dayIndex}`}
-                  >
-                    <div>
-                      {/* Badge bar */}
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="px-3 py-1 bg-white/5 border border-white/10 text-white rounded-lg text-xs font-mono font-bold uppercase tracking-wider">
-                          {workout.dayName}
-                        </span>
-                        {isCompleted && (
-                          <span className="flex items-center gap-1.5 text-xs text-lime-400 bg-lime-500/5 px-2.5 py-0.5 font-semibold rounded-full border border-lime-500/10 font-mono tracking-wider uppercase">
-                            <Check className="w-3.5 h-3.5 glow-lime" /> SECURED
-                          </span>
-                        )}
+                  const gradientBtns: Record<string, string> = {
+                    orange: "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 shadow-orange-500/20",
+                    cyan: "bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 shadow-cyan-500/20",
+                    violet: "bg-gradient-to-r from-fuchsia-500 to-violet-500 hover:from-fuchsia-600 hover:to-violet-600 shadow-violet-500/20"
+                  };
+                  const buttonClass = gradientBtns[workout.accent || "orange"] || "bg-gradient-to-r from-pink-500 to-rose-500 shadow-pink-500/20";
+
+                  return (
+                    <div
+                      key={workout.dayIndex}
+                      className={`liquid-glass-interactive rounded-[2rem] p-6 flex flex-col justify-between relative overflow-hidden group shadow-lg ${accentClass}`}
+                      id={`day-workout-${workout.dayIndex}`}
+                    >
+                      <div>
+                        {/* Badge bar */}
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <span className="px-3 py-1 bg-white/5 border border-white/10 text-white rounded-lg text-xs font-mono font-bold uppercase tracking-wider">
+                              {workout.dayName}
+                            </span>
+                            <span className="px-2.5 py-0.5 text-[10px] bg-white/5 text-neutral-350 border border-white/5 font-mono rounded-full font-bold">
+                              ⏱️ {estimatedDuration} min
+                            </span>
+                            <span className="px-2.5 py-0.5 text-[10px] bg-white/5 text-neutral-350 border border-white/5 font-mono rounded-full font-bold">
+                              {difficulty}
+                            </span>
+                          </div>
+                          {isCompleted && (
+                            <span className="flex items-center gap-1.5 text-xs text-lime-400 bg-lime-500/5 px-2.5 py-0.5 font-semibold rounded-full border border-lime-500/10 font-mono tracking-wider uppercase">
+                              <Check className="w-3.5 h-3.5 glow-lime" /> SECURED
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Header core */}
+                        <h3 className="text-lg font-extrabold text-white uppercase tracking-tight leading-tight mb-2.5">
+                          {workout.title}
+                        </h3>
+
+                        {/* V-Taper Focus Bar */}
+                        <div className="bg-white/2 border border-white/5 rounded-2xl p-3 mb-4 mt-2">
+                          <div className="flex justify-between items-center text-[10px] font-mono font-bold uppercase text-neutral-400">
+                            <span>V-Taper Focus Density</span>
+                            <span className="text-pink-400">{vTaperPct}%</span>
+                          </div>
+                          <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden mt-1.5">
+                            <div
+                              className="bg-gradient-to-r from-pink-500 to-rose-500 h-full rounded-full transition-all duration-500"
+                              style={{ width: `${vTaperPct}%` }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Targeted muscles tags */}
+                        <div className="flex flex-wrap gap-1.5 mb-4 border-t border-white/5 pt-3.5">
+                          {workout.focus.map((tgt, i) => (
+                            <span
+                              key={i}
+                              className="bg-white/3 border border-white/5 text-neutral-400 text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-lg"
+                            >
+                              {tgt}
+                            </span>
+                          ))}
+                        </div>
                       </div>
 
-                      {/* Header core */}
-                      <h3 className="text-lg font-extrabold text-white uppercase tracking-tight leading-tight mb-2.5">
-                        {workout.title}
-                      </h3>
-                      <p className="text-xs text-neutral-400 leading-relaxed mb-4 font-medium">
-                        {workout.description}
-                      </p>
-
-                      {/* Targeted muscles tags */}
-                      <div className="flex flex-wrap gap-1.5 mb-5 border-t border-white/5 pt-3.5">
-                        {workout.focus.map((tgt, i) => (
-                          <span
-                            key={i}
-                            className="bg-white/3 border border-white/5 text-neutral-400 text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-lg"
+                      {/* Expandable Movements Drawer */}
+                      <AnimatePresence>
+                        {isExpanded && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden border-t border-white/5 pt-4 mt-1 flex flex-col gap-2"
                           >
-                            {tgt}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
+                            <h4 className="text-[10px] font-mono font-bold text-neutral-400 uppercase tracking-widest mb-1">Movements Panel ({workout.exercises.length})</h4>
+                            <div className="flex flex-col gap-2 max-h-60 overflow-y-auto pr-1">
+                              {workout.exercises.map((ex) => (
+                                <div key={ex.id} className="flex items-center justify-between bg-white/2 border border-white/5 p-2.5 rounded-xl hover:bg-white/5 transition-all">
+                                  <div className="text-left flex-1 min-w-0">
+                                    <p className="text-xs font-bold text-white truncate">{ex.name}</p>
+                                    <p className="text-[9.5px] text-neutral-400 font-mono mt-0.5">{ex.sets} Sets × {ex.repsRange} | ⏱️ {ex.rest}</p>
+                                  </div>
+                                  <button
+                                    onClick={() => setSelectedGuide(ex)}
+                                    className="p-1.5 bg-white/5 border border-white/5 hover:border-pink-500/30 text-neutral-400 hover:text-pink-400 rounded-lg transition-all"
+                                    title="View Form Guide"
+                                  >
+                                    <Info className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
 
-                    {/* Interaction Launch Buttons */}
-                    <div className="flex items-center gap-3 border-t border-white/5 pt-4 mt-3">
-                      <button
-                        onClick={() => {
-                          setSelectedGuide(workout.exercises[0]);
-                        }}
-                        className="flex-1 text-center bg-transparent hover:bg-white/5 text-neutral-350 hover:text-white font-bold text-xs uppercase px-4 py-3 border border-white/10 rounded-xl transition-all cursor-pointer select-none"
-                      >
-                        Inspect Guides
-                      </button>
+                      {/* Interaction Launch Buttons */}
+                      <div className="flex items-center gap-3 border-t border-white/5 pt-4 mt-3">
+                        <button
+                          onClick={() => {
+                            setExpandedRoutineIndex(isExpanded ? null : workout.dayIndex);
+                          }}
+                          className="flex-1 text-center bg-transparent hover:bg-white/5 text-neutral-350 hover:text-white font-bold text-xs uppercase px-4 py-3 border border-white/10 rounded-xl transition-all cursor-pointer select-none flex items-center justify-center gap-1.5"
+                        >
+                          <span>{isExpanded ? "Close Drawer" : "Preview Moves"}</span>
+                          {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5 rotate-90" />}
+                        </button>
 
-                      <button
-                        onClick={() => {
-                          if (activeWorkout) {
-                            if (confirm(`"${activeWorkout.title}" is currently active in the background. Discard background progress and start this new session?`)) {
+                        <button
+                          onClick={() => {
+                            if (activeWorkout) {
+                              if (confirm(`"${activeWorkout.title}" is currently active in the background. Discard background progress and start this new session?`)) {
+                                setActiveWorkout(workout);
+                                setIsWorkoutMinimized(false);
+                              }
+                            } else {
                               setActiveWorkout(workout);
                               setIsWorkoutMinimized(false);
                             }
-                          } else {
-                            setActiveWorkout(workout);
-                            setIsWorkoutMinimized(false);
-                          }
-                        }}
-                        className={`flex-1 ${buttonClass} text-white font-extrabold text-xs uppercase text-center px-4 py-3.5 rounded-xl transition-all shadow-md active:scale-95 select-none cursor-pointer tracking-wider`}
-                      >
-                        Start Session
-                      </button>
+                          }}
+                          className={`flex-1 ${buttonClass} text-white font-extrabold text-xs uppercase text-center px-4 py-3.5 rounded-xl transition-all shadow-md active:scale-95 select-none cursor-pointer tracking-wider`}
+                        >
+                          Start Session
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </motion.div>
           ) : (
             <motion.div
@@ -1084,7 +900,7 @@ export default function App() {
                 value={editNameInput}
                 onChange={(e) => setEditNameInput(e.target.value)}
                 maxLength={20}
-                placeholder="Name your Gym Tiger"
+                placeholder="Name your Gym - Gemini"
                 className="w-full bg-white/3 border border-white/5 rounded-xl px-4 py-3 text-sm text-white font-bold select-none focus:outline-none focus:border-pink-500/80 mb-4 transition-colors font-sans"
               />
 
@@ -1262,7 +1078,7 @@ git init
 git add .
 
 # 3. Commit elements
-git commit -m "feat: Boot Gym Tiger elite hypertrophy application"
+git commit -m "feat: Boot Gym - Gemini elite hypertrophy application"
 
 # 4. Set branch and pair remote destination
 git branch -M main
